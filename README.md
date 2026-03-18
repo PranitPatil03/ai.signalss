@@ -1,8 +1,6 @@
-# AI Trend Digest
+# Signal
 
-A SaaS platform that delivers personalized daily AI news digests to content creators. Automatically scans multiple sources, ranks trends using a weighted algorithm, and generates ready-to-use scripts for TikTok, YouTube, LinkedIn, and newsletters.
-
-**Live Demo:** [ai-trend-digest.vercel.app](https://ai-trend-digest.vercel.app)
+Signal is a personalized AI updates platform that scans high-signal sources, ranks what matters, and delivers a daily creator-ready brief with scripts and angles.
 
 ![Next.js](https://img.shields.io/badge/Next.js-14-black) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue) ![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green) ![Stripe](https://img.shields.io/badge/Stripe-Payments-purple)
 
@@ -10,45 +8,29 @@ A SaaS platform that delivers personalized daily AI news digests to content crea
 
 ## Features
 
-### Content Aggregation
-- **Multi-source scanning**: HackerNews, Reddit (8 subreddits), Bluesky, Twitter/X, and 10+ RSS feeds
-- **Weighted ranking algorithm**: Prioritizes content by source tier, author reputation, engagement velocity, and keyword relevance
-- **Deduplication**: Jaccard similarity check prevents duplicate trends across 48-hour windows
-
-### AI-Powered Analysis
-- Generates 5 curated trends daily with plain-English summaries
-- Creates platform-specific scripts (TikTok, YouTube, LinkedIn, Twitter, Newsletter)
-- Includes content angles and hooks optimized for each platform
-
-### User Personalization
-- Custom topic tracking and subreddit selection
-- Trusted author boosting (2x ranking multiplier)
-- Configurable delivery time and timezone
-
-### Monetization (Stripe Integration)
-- **Free tier**: 3 topics, TikTok style only, fixed delivery time
-- **Pro tier ($12/mo)**: Unlimited topics, all content styles, custom delivery
-- Full checkout flow with webhook handling for subscription lifecycle
-
-### Email System
-- Automated daily digest delivery via Resend
-- Open tracking with 1x1 pixel
-- Upgrade CTAs for free users
-- Secure token-based unsubscribe
+- **Multi-source scanning**: Collects daily AI signals from Reddit, Hacker News, Bluesky, X, and curated RSS feeds.
+- **Relevance ranking**: Scores trends by source quality, engagement velocity, and user preference matching.
+- **AI summarization**: Converts raw links into plain-English updates with clear why-it-matters context.
+- **Script generation**: Produces ready-to-use TikTok/YouTube/LinkedIn/Twitter/Newsletter content drafts.
+- **Personalized feeds**: Tailors topics, subreddits, style, timezone, and send windows per user.
+- **Tiered access**: Supports free and pro feature limits with Stripe-based subscription upgrades.
+- **Automated delivery**: Sends daily digest emails with open tracking and secure unsubscribe handling.
+- **Admin-safe operations**: Restricts scan/send automation to cron or approved admin identities.
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | Next.js 14, React, Tailwind CSS |
-| Backend | Next.js API Routes, Server Components |
-| Database | Supabase (PostgreSQL) |
-| AI | Anthropic Claude API |
-| Payments | Stripe (Checkout, Webhooks) |
-| Email | Resend |
-| Hosting | Vercel |
+| Area | Stack | Purpose |
+|------|-------|---------|
+| Frontend | Next.js 14 (App Router), React 18, TypeScript | Builds the landing, onboarding, settings, and dashboard UI with typed components. |
+| Styling | Tailwind CSS v4, Lucide icons | Delivers the design system, responsive layouts, and iconography. |
+| Auth & DB | Supabase Auth + Postgres (supabase-js v2) | Handles email/password + Google OAuth sessions and stores users, trends, and digests. |
+| API Layer | Next.js Route Handlers | Exposes scan, digest, preferences, billing, tracking, and auth sync endpoints. |
+| AI Processing | Anthropic Claude SDK | Summarizes trends and generates creator-ready scripts/angles. |
+| Billing | Stripe Checkout + Webhooks | Manages plan upgrades, subscription lifecycle, and entitlement updates. |
+| Email Delivery | Resend | Sends digest emails, tracks opens, and supports secure unsubscribe links. |
+| Deployment | Vercel | Hosts the Next.js app and runs scheduled cron-triggered operations. |
 
 ---
 
@@ -108,6 +90,11 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_legacy_anon_jwt
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=sb_publishable_...
 SUPABASE_SERVICE_ROLE_KEY=sb_secret_...
 SUPABASE_SERVICE_KEY=your_service_key
+
+# Google OAuth (Supabase provider settings)
+GOOGLE_OAUTH_CLIENT_ID=your_google_client_id
+GOOGLE_OAUTH_CLIENT_SECRET=your_google_client_secret
+GOOGLE_OAUTH_SUPABASE_CALLBACK_URL=https://your-project-ref.supabase.co/auth/v1/callback
 
 # Anthropic
 ANTHROPIC_API_KEY=your_anthropic_key
@@ -218,15 +205,3 @@ npm run dev
 0 6 * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" https://your-domain.com/api/scan
 0 7 * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" https://your-domain.com/api/send-digests
 ```
-
----
-
-## License
-
-MIT
-
----
-
-## Author
-
-Reid Chong - [GitHub](https://github.com/Rchong01010)

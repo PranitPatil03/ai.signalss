@@ -2,6 +2,8 @@ import { ArrowRight, BellRing, Brain, Check, ChevronDown, Clock, Code2, Sparkles
 import { EmailSignup } from '@/components/landing/EmailSignup'
 import { TrendPreview } from '@/components/landing/TrendPreview'
 
+export const dynamic = 'force-dynamic'
+
 export default function LandingPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f8fafc]">
