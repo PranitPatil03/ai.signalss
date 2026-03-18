@@ -1,368 +1,326 @@
-import { Zap, Clock, Sparkles, Users, Check, ChevronDown, Mail, Settings, Inbox } from 'lucide-react'
+import { ArrowRight, BellRing, Brain, Check, ChevronDown, Clock, Code2, Sparkles, Target, Zap } from 'lucide-react'
 import { EmailSignup } from '@/components/landing/EmailSignup'
 import { TrendPreview } from '@/components/landing/TrendPreview'
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-electric/5 via-transparent to-transparent" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-electric/10 rounded-full blur-3xl" />
+    <main className="relative min-h-screen overflow-hidden bg-[#f8fafc]">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-20 -left-16 h-96 w-96 rounded-full bg-emerald-200/35 blur-3xl" />
+        <div className="absolute top-36 -right-16 h-96 w-96 rounded-full bg-cyan-200/30 blur-3xl" />
+        <div className="absolute bottom-20 left-1/3 h-80 w-80 rounded-full bg-teal-100/50 blur-3xl" />
+      </div>
 
-        <div className="relative max-w-6xl mx-auto px-4 py-20 md:py-32">
-          <div className="text-center space-y-6">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-electric/10 border border-electric/20 text-electric text-sm">
-              <Sparkles className="w-4 h-4" />
-              For content creators
+      <header className="sticky top-0 z-40 border-b border-border/70 bg-surface/75 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-700">
+              <Sparkles className="h-4 w-4" />
+            </span>
+            <span className="text-lg font-medium tracking-tight text-text-primary">AI Daily Updates</span>
+          </div>
+
+          <nav className="hidden items-center gap-8 text-sm text-text-secondary md:flex">
+            <a href="#features" className="transition-colors hover:text-text-primary">Features</a>
+            <a href="#pricing" className="transition-colors hover:text-text-primary">Pricing</a>
+            <a href="#faq" className="transition-colors hover:text-text-primary">FAQ</a>
+          </nav>
+
+          <a
+            href="#signup"
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-emerald-600 bg-linear-to-b from-emerald-400 to-emerald-600 px-4 text-sm font-medium text-white shadow-[0_4px_16px_rgba(5,150,105,0.35)] transition-all hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(5,150,105,0.45)]"
+          >
+            Start Free
+          </a>
+        </div>
+      </header>
+
+      <section className="relative px-4 pb-24 pt-16 md:pt-20">
+        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-2 md:items-center">
+          <div className="text-center md:text-left">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white/90 px-3 py-1 text-sm text-emerald-700 shadow-sm">
+              <BellRing className="h-4 w-4" />
+              The daily pulse of artificial intelligence
             </div>
 
-            {/* Headline */}
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-              AI moves fast.
-              <br />
-              <span className="gradient-text">We catch you up.</span>
+            <h1 className="text-4xl font-light tracking-tight text-text-primary sm:text-5xl md:text-6xl lg:text-7xl">
+              Stay Ahead of AI.
+              <br className="hidden sm:block" />
+              <span className="bg-linear-to-r from-emerald-700 to-cyan-600 bg-clip-text text-transparent">
+                Without Reading Everything.
+              </span>
             </h1>
 
-            {/* Subheadline */}
-            <p className="max-w-xl mx-auto text-lg md:text-xl text-text-secondary">
-              A 2-minute daily digest of AI news, written for creators not engineers.
-              Know what's trending before you make your next video.
+            <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-text-secondary md:mx-0 md:text-lg">
+              Get curated AI updates across business, startups, movies, research, content creation, and more,
+              all summarized so you never miss what matters.
             </p>
 
-            {/* Email signup */}
-            <div className="flex justify-center pt-4">
-              <EmailSignup />
+            <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row md:items-start">
+              <a
+                href="#signup"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-emerald-700 bg-linear-to-b from-emerald-400 to-emerald-600 px-7 text-sm font-medium text-white shadow-[0_4px_16px_rgba(5,150,105,0.35)] transition-all hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(5,150,105,0.45)]"
+              >
+                Start Your AI Daily Feed
+                <ArrowRight className="h-4 w-4" />
+              </a>
+              <a
+                href="#features"
+                className="inline-flex h-12 items-center justify-center rounded-xl border border-border bg-white px-7 text-sm font-medium text-text-primary shadow-sm transition-colors hover:bg-surface-hover"
+              >
+                See Features
+              </a>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-text-muted md:justify-start">
+              <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Free plan available</span>
+              <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Email + Google auth</span>
+              <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Personalized by interests</span>
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="rounded-2xl border border-border bg-white/90 p-5 shadow-[0_15px_60px_rgba(15,23,42,0.1)] backdrop-blur-sm">
+              <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-text-muted">Today</p>
+                  <h3 className="text-lg font-semibold text-text-primary">AI Signal Board</h3>
+                </div>
+                <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">5 min read</span>
+              </div>
+
+              <div className="space-y-3">
+                <div className="rounded-xl border border-border bg-surface p-3">
+                  <div className="mb-2 flex items-center gap-2 text-sm text-text-primary">
+                    <Code2 className="h-4 w-4 text-emerald-700" />
+                    Open-source coding models improved repo-level edits
+                  </div>
+                  <p className="text-xs text-text-secondary">Action: route tests + docs generation to cheaper models, keep premium for architecture tasks.</p>
+                </div>
+                <div className="rounded-xl border border-border bg-surface p-3">
+                  <div className="mb-2 flex items-center gap-2 text-sm text-text-primary">
+                    <Brain className="h-4 w-4 text-cyan-700" />
+                    Agent orchestration defaults changed in major frameworks
+                  </div>
+                  <p className="text-xs text-text-secondary">Action: add tool schema validation and retry policies before release.</p>
+                </div>
+                <div className="rounded-xl border border-border bg-surface p-3">
+                  <div className="mb-2 flex items-center gap-2 text-sm text-text-primary">
+                    <Target className="h-4 w-4 text-teal-700" />
+                    Claude computer-use benchmarks moved up this week
+                  </div>
+                  <p className="text-xs text-text-secondary">Action: automate repetitive UI QA flows for regression checks.</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Value Props */}
-      <section className="py-16 border-t border-border">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center space-y-3">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-electric/10">
-                <Clock className="w-6 h-6 text-electric" />
-              </div>
-              <h3 className="text-lg font-semibold text-text-primary">2 minutes, every morning</h3>
-              <p className="text-text-secondary text-sm">
-                Delivered at 7am PT. Just enough to stay informed without the doomscroll.
-              </p>
-            </div>
-            <div className="text-center space-y-3">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-accent/10">
-                <Zap className="w-6 h-6 text-accent" />
-              </div>
-              <h3 className="text-lg font-semibold text-text-primary">Content angles included</h3>
-              <p className="text-text-secondary text-sm">
-                Every trend comes with a TikTok/YouTube hook idea. Skip the research, start recording.
-              </p>
-            </div>
-            <div className="text-center space-y-3">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-purple-500/10">
-                <Users className="w-6 h-6 text-purple-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-text-primary">Written for normal people</h3>
-              <p className="text-text-secondary text-sm">
-                No jargon, no PhD required. If your audience isn't ML researchers, neither is ours.
-              </p>
-            </div>
+      <section id="signup" className="relative px-4 pb-24">
+        <div className="mx-auto max-w-4xl rounded-2xl border border-border bg-white/95 p-6 shadow-[0_8px_28px_rgba(15,23,42,0.08)] md:p-10">
+          <div className="mb-8 text-center">
+            <h2 className="text-3xl font-light tracking-tight text-text-primary md:text-4xl">Create your personalized AI feed</h2>
+            <p className="mt-3 text-text-secondary">Sign up in 30 seconds and choose what you want to track.</p>
+          </div>
+          <div className="flex justify-center">
+            <EmailSignup buttonText="Create free account" />
           </div>
         </div>
       </section>
 
-      {/* Preview Section */}
-      <section className="py-16 md:py-24 bg-surface">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center space-y-4 mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary">
-              Here's what you'll get
-            </h2>
-            <p className="text-text-secondary max-w-lg mx-auto">
-              A curated feed of what actually matters, with content ideas built in.
-            </p>
+      <section id="features" className="px-4 pb-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-12 text-center">
+            <h2 className="text-4xl font-light tracking-tight text-text-primary md:text-5xl">Everything you need to stay updated</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-text-secondary">Inspired by modern product landings: clean layout, bold hierarchy, and practical value.</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            <article className="rounded-2xl border border-border bg-white p-6 shadow-sm md:col-span-2">
+              <div className="mb-4 inline-flex rounded-lg bg-emerald-100 p-2 text-emerald-700">
+                <Zap className="h-5 w-5" />
+              </div>
+              <h3 className="text-2xl font-semibold text-text-primary">Daily briefs made for your role</h3>
+              <p className="mt-2 text-text-secondary">
+                Developer, founder, PM, or creator. We adapt output tone and depth to your context so it feels instantly useful.
+              </p>
+            </article>
+
+            <article className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+              <div className="mb-4 inline-flex rounded-lg bg-cyan-100 p-2 text-cyan-700">
+                <Clock className="h-5 w-5" />
+              </div>
+              <h3 className="text-xl font-semibold text-text-primary">5 to 10 min format</h3>
+              <p className="mt-2 text-sm text-text-secondary">
+                Quick read with practical actions.
+              </p>
+            </article>
+
+            <article className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+              <div className="mb-4 inline-flex rounded-lg bg-teal-100 p-2 text-teal-700">
+                <Target className="h-5 w-5" />
+              </div>
+              <h3 className="text-xl font-semibold text-text-primary">Interest targeting</h3>
+              <p className="mt-2 text-sm text-text-secondary">
+                Select topics once, refine anytime.
+              </p>
+            </article>
+
+            <article className="rounded-2xl border border-border bg-white p-6 shadow-sm md:col-span-2">
+              <div className="mb-4 inline-flex rounded-lg bg-slate-100 p-2 text-slate-700">
+                <Brain className="h-5 w-5" />
+              </div>
+              <h3 className="text-2xl font-semibold text-text-primary">Action-first insights, not generic news</h3>
+              <p className="mt-2 text-text-secondary">Every trend includes why-it-matters and next-step ideas, so users can ship faster and decide better.</p>
+            </article>
+
+            <article className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+              <div className="mb-4 inline-flex rounded-lg bg-emerald-100 p-2 text-emerald-700">
+                <Code2 className="h-5 w-5" />
+              </div>
+              <h3 className="text-xl font-semibold text-text-primary">Built for AI builders</h3>
+              <p className="mt-2 text-sm text-text-secondary">Tools, models, workflows, and product moves.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 pb-24">
+        <div className="mx-auto max-w-6xl rounded-2xl border border-border bg-white p-6 shadow-sm md:p-8">
+          <div className="mb-10 text-center">
+            <h2 className="text-3xl font-light tracking-tight text-text-primary md:text-4xl">Preview your daily digest</h2>
+            <p className="mt-3 text-text-secondary">A clean, scannable feed with clear priority and practical context.</p>
           </div>
           <TrendPreview />
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-16 md:py-24 border-t border-border">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary">
-              How it works
-            </h2>
-            <p className="text-text-secondary max-w-lg mx-auto">
-              Get started in under a minute. No credit card required.
-            </p>
+      <section id="pricing" className="px-4 pb-24">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-12 text-center">
+            <h2 className="text-4xl font-light tracking-tight text-text-primary md:text-5xl">Simple pricing</h2>
+            <p className="mt-3 text-text-secondary">Start free. Upgrade only when you want deeper personalization.</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-electric/10 border border-electric/20">
-                <Mail className="w-8 h-8 text-electric" />
-              </div>
-              <div className="text-4xl font-bold text-text-muted">1</div>
-              <h3 className="text-lg font-semibold text-text-primary">Sign up with email</h3>
-              <p className="text-text-secondary text-sm">
-                Enter your email and verify. That's it - no password needed.
-              </p>
-            </div>
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent/10 border border-accent/20">
-                <Settings className="w-8 h-8 text-accent" />
-              </div>
-              <div className="text-4xl font-bold text-text-muted">2</div>
-              <h3 className="text-lg font-semibold text-text-primary">Pick your topics</h3>
-              <p className="text-text-secondary text-sm">
-                Choose what AI topics you want to track. We'll personalize your digest.
-              </p>
-            </div>
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/20">
-                <Inbox className="w-8 h-8 text-purple-400" />
-              </div>
-              <div className="text-4xl font-bold text-text-muted">3</div>
-              <h3 className="text-lg font-semibold text-text-primary">Get daily digest</h3>
-              <p className="text-text-secondary text-sm">
-                Wake up to curated AI trends with content angles ready to use.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Pricing Section */}
-      <section className="py-16 md:py-24 bg-surface">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center space-y-4 mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary">
-              Simple pricing
-            </h2>
-            <p className="text-text-secondary max-w-lg mx-auto">
-              Start free, upgrade when you need more.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Free Plan */}
-            <div className="bg-surface-elevated border border-border rounded-2xl p-8">
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold text-text-primary mb-2">Free</h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-text-primary">$0</span>
-                  <span className="text-text-muted">/month</span>
-                </div>
+          <div className="grid gap-6 md:grid-cols-2 md:items-center">
+            <article className="rounded-2xl border border-border bg-white p-8 shadow-sm md:scale-95">
+              <h3 className="text-2xl font-semibold text-text-primary">Free</h3>
+              <p className="mt-1 text-sm text-text-secondary">For devs getting started</p>
+              <div className="mt-6 flex items-baseline gap-1">
+                <span className="text-5xl font-light tracking-tight text-text-primary">$0</span>
+                <span className="text-text-muted">/month</span>
               </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-3 text-text-secondary">
-                  <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>3 topics to track</span>
-                </li>
-                <li className="flex items-center gap-3 text-text-secondary">
-                  <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>Daily email digest</span>
-                </li>
-                <li className="flex items-center gap-3 text-text-secondary">
-                  <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>TikTok content style</span>
-                </li>
-                <li className="flex items-center gap-3 text-text-secondary">
-                  <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>5 daily trends</span>
-                </li>
+              <ul className="mt-8 space-y-3 text-sm text-text-secondary">
+                <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />3 tracked interests</li>
+                <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />One daily digest at fixed time</li>
+                <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />5 top signals each day</li>
+                <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />Email + in-app access</li>
               </ul>
-              <div className="flex justify-center">
-                <EmailSignup buttonText="Get Started Free" />
-              </div>
-            </div>
+              <a
+                href="#signup"
+                className="mt-8 inline-flex h-11 w-full items-center justify-center rounded-xl border border-border bg-surface text-sm font-medium text-text-primary transition-colors hover:bg-surface-hover"
+              >
+                Start Free
+              </a>
+            </article>
 
-            {/* Pro Plan */}
-            <div className="bg-gradient-to-b from-electric/5 to-transparent border-2 border-electric/30 rounded-2xl p-8 relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="px-3 py-1 bg-electric text-white text-xs font-semibold rounded-full">
-                  Most Popular
-                </span>
+            <article className="relative rounded-2xl border border-emerald-300 bg-white p-8 shadow-[0_12px_36px_rgba(5,150,105,0.12)]">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">Most Popular</div>
+              <h3 className="text-2xl font-semibold text-text-primary">Pro</h3>
+              <p className="mt-1 text-sm text-text-secondary">For teams moving fast with AI</p>
+              <div className="mt-6 flex items-baseline gap-1">
+                <span className="text-5xl font-light tracking-tight text-text-primary">$12</span>
+                <span className="text-text-muted">/month</span>
               </div>
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold text-text-primary mb-2">Pro</h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-text-primary">$12</span>
-                  <span className="text-text-muted">/month</span>
-                </div>
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-3 text-text-secondary">
-                  <Check className="w-5 h-5 text-electric flex-shrink-0" />
-                  <span>Unlimited topics</span>
-                </li>
-                <li className="flex items-center gap-3 text-text-secondary">
-                  <Check className="w-5 h-5 text-electric flex-shrink-0" />
-                  <span>All content styles (YouTube, LinkedIn, Twitter, Newsletter)</span>
-                </li>
-                <li className="flex items-center gap-3 text-text-secondary">
-                  <Check className="w-5 h-5 text-electric flex-shrink-0" />
-                  <span>Custom delivery time</span>
-                </li>
-                <li className="flex items-center gap-3 text-text-secondary">
-                  <Check className="w-5 h-5 text-electric flex-shrink-0" />
-                  <span>Priority support</span>
-                </li>
+              <ul className="mt-8 space-y-3 text-sm text-text-secondary">
+                <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />Unlimited interests</li>
+                <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />Custom delivery schedule</li>
+                <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />Deep-dive and role-based formats</li>
+                <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />Priority sources and support</li>
               </ul>
-              <div className="flex justify-center">
-                <EmailSignup buttonText="Start Pro Trial" />
-              </div>
-            </div>
+              <a
+                href="#signup"
+                className="mt-8 inline-flex h-11 w-full items-center justify-center rounded-xl border border-emerald-700 bg-linear-to-b from-emerald-400 to-emerald-600 text-sm font-medium text-white shadow-[0_4px_16px_rgba(5,150,105,0.35)] transition-all hover:scale-[1.01] hover:shadow-[0_8px_24px_rgba(5,150,105,0.45)]"
+              >
+                Upgrade to Pro
+              </a>
+            </article>
           </div>
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-16 md:py-24 border-t border-border">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center space-y-4 mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary">
-              Loved by creators
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-surface-elevated border border-border rounded-xl p-6">
-              <p className="text-text-secondary mb-4">
-                "Finally, I don't have to spend hours scrolling Twitter to find AI news. The content angles are gold."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-electric/20 flex items-center justify-center">
-                  <span className="text-electric font-semibold">JD</span>
-                </div>
-                <div>
-                  <div className="font-medium text-text-primary">Jamie D.</div>
-                  <div className="text-sm text-text-muted">Tech YouTuber, 120K subs</div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-surface-elevated border border-border rounded-xl p-6">
-              <p className="text-text-secondary mb-4">
-                "Went from posting 2x/week to daily because I always have ideas now. Game changer for engagement."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-                  <span className="text-accent font-semibold">MK</span>
-                </div>
-                <div>
-                  <div className="font-medium text-text-primary">Marcus K.</div>
-                  <div className="text-sm text-text-muted">TikTok Creator, 85K followers</div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-surface-elevated border border-border rounded-xl p-6">
-              <p className="text-text-secondary mb-4">
-                "The LinkedIn format is perfect. My posts get 3x more engagement since switching to AI Trend Digest."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
-                  <span className="text-purple-400 font-semibold">SR</span>
-                </div>
-                <div>
-                  <div className="font-medium text-text-primary">Sarah R.</div>
-                  <div className="text-sm text-text-muted">AI Consultant, LinkedIn Top Voice</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-16 md:py-24 bg-surface">
+      <section id="faq" className="px-4 pb-24">
         <div className="max-w-3xl mx-auto px-4">
-          <div className="text-center space-y-4 mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary">
-              Frequently asked questions
-            </h2>
+          <div className="mb-12 text-center">
+            <h2 className="text-4xl font-light tracking-tight text-text-primary md:text-5xl">Frequently asked questions</h2>
           </div>
-          <div className="space-y-4">
-            <details className="group bg-surface-elevated border border-border rounded-xl">
+
+          <div className="space-y-3">
+            <details className="group rounded-xl border border-border bg-white shadow-sm">
               <summary className="flex items-center justify-between p-5 cursor-pointer">
                 <span className="font-medium text-text-primary">What sources do you scan?</span>
                 <ChevronDown className="w-5 h-5 text-text-muted group-open:rotate-180 transition-transform" />
               </summary>
               <div className="px-5 pb-5 text-text-secondary">
-                We scan Hacker News, Reddit (multiple AI subreddits), Bluesky, X/Twitter, and RSS feeds from major AI company blogs and tech news sites. Our ranking algorithm prioritizes content from trusted sources and accounts.
+                Reddit, Hacker News, X, GitHub, AI labs, and selected newsletters. Ranking balances trust, freshness, and your interests.
               </div>
             </details>
-            <details className="group bg-surface-elevated border border-border rounded-xl">
+
+            <details className="group rounded-xl border border-border bg-white shadow-sm">
               <summary className="flex items-center justify-between p-5 cursor-pointer">
                 <span className="font-medium text-text-primary">When do I get my digest?</span>
                 <ChevronDown className="w-5 h-5 text-text-muted group-open:rotate-180 transition-transform" />
               </summary>
               <div className="px-5 pb-5 text-text-secondary">
-                Free users receive their digest at 7am PT daily. Pro users can customize their delivery time to any hour that works for their schedule.
+                Free users get one daily digest at a default time. Pro users can choose custom delivery windows.
               </div>
             </details>
-            <details className="group bg-surface-elevated border border-border rounded-xl">
+
+            <details className="group rounded-xl border border-border bg-white shadow-sm">
               <summary className="flex items-center justify-between p-5 cursor-pointer">
-                <span className="font-medium text-text-primary">Can I change my topics?</span>
+                <span className="font-medium text-text-primary">Can I change interests later?</span>
                 <ChevronDown className="w-5 h-5 text-text-muted group-open:rotate-180 transition-transform" />
               </summary>
               <div className="px-5 pb-5 text-text-secondary">
-                Yes! You can update your topics, preferred subreddits, and trusted authors anytime from your settings dashboard. Changes take effect on your next digest.
+                Yes. Update interests anytime in settings. Changes are applied from the next digest onward.
               </div>
             </details>
-            <details className="group bg-surface-elevated border border-border rounded-xl">
+
+            <details className="group rounded-xl border border-border bg-white shadow-sm">
               <summary className="flex items-center justify-between p-5 cursor-pointer">
-                <span className="font-medium text-text-primary">How do I cancel?</span>
+                <span className="font-medium text-text-primary">Is Google sign in supported?</span>
                 <ChevronDown className="w-5 h-5 text-text-muted group-open:rotate-180 transition-transform" />
               </summary>
               <div className="px-5 pb-5 text-text-secondary">
-                You can cancel your Pro subscription anytime from your settings. You'll continue to have Pro access until the end of your billing period, then automatically switch to the free plan.
+                Yes. You can sign in using both email/password and Google OAuth.
               </div>
             </details>
           </div>
         </div>
       </section>
 
-      {/* Social Proof (Placeholder) */}
-      <section className="py-16 border-t border-border">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="text-text-muted text-sm uppercase tracking-wide mb-8">
-            Trusted by creators making AI content
-          </p>
-          <div className="flex flex-wrap justify-center gap-8 opacity-40">
-            {/* Placeholder logos - replace with real ones later */}
-            {['@techcreator', '@aiexplained', '@futureproof', '@bytesized'].map((handle) => (
-              <div key={handle} className="text-text-secondary font-mono">
-                {handle}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="py-20 md:py-32 bg-gradient-to-b from-surface to-surface-elevated">
+      <section className="border-t border-border px-4 py-20 md:py-24">
         <div className="max-w-2xl mx-auto px-4 text-center space-y-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-text-primary">
-            Stop missing the story
-          </h2>
-          <p className="text-text-secondary text-lg">
-            Join thousands of creators who start their day knowing what's trending in AI.
+          <h2 className="text-3xl font-light tracking-tight text-text-primary md:text-4xl">Cut noise. Keep signal.</h2>
+          <p className="text-lg text-text-secondary">
+            Build faster with a daily AI brief designed for real execution.
           </p>
-          <div className="flex justify-center">
-            <EmailSignup />
-          </div>
+          <a
+            href="#signup"
+            className="inline-flex h-12 items-center justify-center rounded-xl border border-emerald-700 bg-linear-to-b from-emerald-400 to-emerald-600 px-8 text-sm font-medium text-white shadow-[0_4px_16px_rgba(5,150,105,0.35)] transition-all hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(5,150,105,0.45)]"
+          >
+            Start free now
+          </a>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 border-t border-border">
+      <footer className="border-t border-border py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2 text-text-secondary">
-              <Sparkles className="w-5 h-5 text-electric" />
-              <span className="font-semibold">AI Trend Digest</span>
+              <Sparkles className="w-5 h-5 text-emerald-700" />
+              <span className="font-semibold">AI Daily Updates</span>
             </div>
             <div className="flex gap-6 text-sm text-text-muted">
               <a href="#" className="hover:text-text-secondary transition-colors">Privacy</a>

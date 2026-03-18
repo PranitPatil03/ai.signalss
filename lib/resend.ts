@@ -1,5 +1,6 @@
 import { Resend } from 'resend'
 import crypto from 'crypto'
+import { generateDigestAccessToken } from '@/lib/digest-token'
 
 let _resend: Resend | null = null
 
@@ -16,7 +17,12 @@ function getResend(): Resend {
 
 // Generate unsubscribe token
 function generateUnsubscribeToken(userId: string): string {
-  const secret = process.env.UNSUBSCRIBE_SECRET || 'default-secret'
+  const secret = process.env.UNSUBSCRIBE_SECRET
+
+  if (!secret) {
+    throw new Error('UNSUBSCRIBE_SECRET is required')
+  }
+
   return crypto
     .createHmac('sha256', secret)
     .update(userId)
@@ -72,7 +78,10 @@ export async function sendDigestEmail(
   userTier?: 'free' | 'pro'
 ) {
   const topTopic = trends[0]?.title || 'AI Updates'
-  const webViewUrl = `${process.env.NEXT_PUBLIC_URL}/digest/${digestId}`
+  const digestToken = userId ? generateDigestAccessToken(digestId, userId) : null
+  const webViewUrl = digestToken
+    ? `${process.env.NEXT_PUBLIC_URL}/digest/${digestId}?token=${digestToken}`
+    : `${process.env.NEXT_PUBLIC_URL}/digest/${digestId}`
   const trackingPixelUrl = `${process.env.NEXT_PUBLIC_URL}/api/track/open?id=${digestId}`
   const unsubscribeUrl = userId
     ? `${process.env.NEXT_PUBLIC_URL}/api/unsubscribe?user=${userId}&token=${generateUnsubscribeToken(userId)}`
@@ -126,7 +135,7 @@ ${trend.script}
       <p style="margin: 0 0 16px; color: #a16207; font-size: 14px;">
         Get unlimited topics, all content styles (YouTube, LinkedIn, Twitter, Newsletter), and custom delivery times.
       </p>
-      <a href="${process.env.NEXT_PUBLIC_URL}/settings${userId ? `?user=${userId}` : ''}" style="display: inline-block; padding: 10px 20px; background: #f59e0b; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">
+        <a href="${process.env.NEXT_PUBLIC_URL}/settings" style="display: inline-block; padding: 10px 20px; background: #f59e0b; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">
         Upgrade for $12/mo
       </a>
     </div>

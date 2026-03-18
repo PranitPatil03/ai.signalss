@@ -1,21 +1,42 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || ''
+const supabasePublishableKey =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  ''
+const supabaseServiceKey =
+  process.env.SUPABASE_SERVICE_KEY ||
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  ''
+
+export function getSupabaseUrl(): string {
+  return supabaseUrl
+}
+
+export function getSupabasePublishableKey(): string {
+  return supabasePublishableKey
+}
+
+export function getSupabaseServiceKey(): string {
+  return supabaseServiceKey
+}
 
 function createSupabaseClient(): SupabaseClient {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Supabase URL and anon key are required')
+  if (!supabaseUrl || !supabasePublishableKey) {
+    throw new Error('Supabase URL and publishable key are required')
   }
-  return createClient(supabaseUrl, supabaseAnonKey)
+  return createClient(supabaseUrl, supabasePublishableKey)
 }
 
 function createSupabaseAdmin(): SupabaseClient {
-  if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error('Supabase URL and service key are required')
+  const privilegedKey = supabaseServiceKey || supabasePublishableKey
+
+  if (!supabaseUrl || !privilegedKey) {
+    throw new Error('Supabase URL and key are required')
   }
-  return createClient(supabaseUrl, supabaseServiceKey)
+
+  return createClient(supabaseUrl, privilegedKey)
 }
 
 // Lazy singletons

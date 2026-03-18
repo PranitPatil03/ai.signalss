@@ -104,7 +104,9 @@ cp .env.example .env.local
 ```env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_legacy_anon_jwt
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=sb_publishable_...
+SUPABASE_SERVICE_ROLE_KEY=sb_secret_...
 SUPABASE_SERVICE_KEY=your_service_key
 
 # Anthropic
@@ -121,6 +123,14 @@ RESEND_API_KEY=re_...
 # App
 NEXT_PUBLIC_URL=http://localhost:3000
 ADMIN_EMAIL=your@email.com
+ADMIN_EMAILS=admin1@email.com,admin2@email.com
+CRON_SECRET=your-random-secret
+MIGRATION_SECRET=your-migration-secret
+SEED_SECRET=your-local-seed-secret
+UNSUBSCRIBE_SECRET=your-unsubscribe-secret
+DIGEST_LINK_SECRET=optional-digest-link-secret
+ENABLE_LEGACY_SUBSCRIBE=false
+ALLOW_RUNTIME_MIGRATIONS=false
 ```
 
 ### Database Setup
@@ -183,8 +193,8 @@ npm run dev
 |----------|--------|-------------|
 | `/api/scan` | POST | Trigger trend scan |
 | `/api/send-digests` | POST | Send emails to all verified users |
-| `/api/subscribe` | POST | Register new user |
-| `/api/verify` | GET | Verify email token |
+| `/api/subscribe` | POST | Legacy endpoint (disabled by default) |
+| `/api/verify` | GET | Legacy endpoint (disabled by default) |
 | `/api/user/preferences` | GET/POST | Manage user settings |
 | `/api/stripe/checkout` | POST | Create Stripe checkout session |
 | `/api/stripe/webhook` | POST | Handle Stripe events |
@@ -205,8 +215,8 @@ npm run dev
 ### Cron Jobs
 
 ```
-0 6 * * * curl -X POST https://your-domain.com/api/scan        # 6am PT
-0 7 * * * curl -X POST https://your-domain.com/api/send-digests # 7am PT
+0 6 * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" https://your-domain.com/api/scan
+0 7 * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" https://your-domain.com/api/send-digests
 ```
 
 ---

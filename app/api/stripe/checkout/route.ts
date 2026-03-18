@@ -1,21 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStripe, PLANS } from '@/lib/stripe'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin, getSupabaseServiceKey } from '@/lib/supabase'
+import {
+  createUserScopedSupabaseClient,
+  getAuthenticatedUser,
+  getBearerToken,
+} from '@/lib/auth-server'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { userId } = body
+    const authUser = await getAuthenticatedUser(request)
+    const token = getBearerToken(request)
 
-    if (!userId) {
+    if (!authUser?.id || !token) {
       return NextResponse.json(
-        { error: 'User ID is required' },
-        { status: 400 }
+        { error: 'Unauthorized' },
+        { status: 401 }
       )
     }
 
+    const userId = authUser.id
+    const hasServiceKey = Boolean(getSupabaseServiceKey())
+    const db = hasServiceKey ? getSupabaseAdmin() : createUserScopedSupabaseClient(token)
+
     // Get user from database
-    const { data: user, error: userError } = await supabaseAdmin
+    const { data: user, error: userError } = await db
       .from('users')
       .select('email, stripe_customer_id')
       .eq('id', userId)
@@ -40,7 +49,7 @@ export async function POST(request: NextRequest) {
       customerId = customer.id
 
       // Save customer ID to database
-      await supabaseAdmin
+      await db
         .from('users')
         .update({ stripe_customer_id: customerId })
         .eq('id', userId)
@@ -65,8 +74,8 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.NEXT_PUBLIC_URL}/settings?user=${userId}&upgraded=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_URL}/settings?user=${userId}&cancelled=true`,
+      success_url: `${process.env.NEXT_PUBLIC_URL}/settings?upgraded=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_URL}/settings?cancelled=true`,
       metadata: { userId },
     })
 

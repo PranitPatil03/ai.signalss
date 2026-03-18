@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { Cpu, Wrench, BookOpen, Flame, Sparkles, ExternalLink } from 'lucide-react'
 import { supabaseAdmin } from '@/lib/supabase'
+import { verifyDigestAccessToken } from '@/lib/digest-token'
 import Link from 'next/link'
 
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -23,10 +24,12 @@ export const dynamic = 'force-dynamic'
 
 interface PageProps {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ token?: string }>
 }
 
-export default async function DigestPage({ params }: PageProps) {
+export default async function DigestPage({ params, searchParams }: PageProps) {
   const { id } = await params
+  const { token } = await searchParams
 
   // Fetch the digest
   const { data: digest, error: digestError } = await supabaseAdmin
@@ -36,6 +39,10 @@ export default async function DigestPage({ params }: PageProps) {
     .single()
 
   if (digestError || !digest) {
+    notFound()
+  }
+
+  if (!token || !verifyDigestAccessToken(id, digest.user_id, token)) {
     notFound()
   }
 

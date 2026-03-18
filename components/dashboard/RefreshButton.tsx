@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { getAuthHeaders } from '@/lib/auth-client'
 
 export function RefreshButton() {
   const [isLoading, setIsLoading] = useState(false)
@@ -14,8 +15,10 @@ export function RefreshButton() {
     setError(null)
 
     try {
+      const headers = await getAuthHeaders()
       const response = await fetch('/api/scan', {
         method: 'POST',
+        headers,
       })
 
       if (!response.ok) {

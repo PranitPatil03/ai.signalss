@@ -2,15 +2,29 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import crypto from 'crypto'
 
+function getUnsubscribeSecret(): string | null {
+  return process.env.UNSUBSCRIBE_SECRET || null
+}
+
 // Verify unsubscribe token
 function verifyToken(userId: string, token: string): boolean {
-  const secret = process.env.UNSUBSCRIBE_SECRET || 'default-secret'
+  const secret = getUnsubscribeSecret()
+
+  if (!secret) {
+    return false
+  }
+
   const expectedToken = crypto
     .createHmac('sha256', secret)
     .update(userId)
     .digest('hex')
     .slice(0, 16)
-  return token === expectedToken
+
+  if (expectedToken.length !== token.length) {
+    return false
+  }
+
+  return crypto.timingSafeEqual(Buffer.from(expectedToken), Buffer.from(token))
 }
 
 export async function GET(request: NextRequest) {

@@ -1,24 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin, UserPreferences } from '@/lib/supabase'
+import { UserPreferences, getSupabaseAdmin, getSupabaseServiceKey } from '@/lib/supabase'
 import { PLANS } from '@/lib/stripe'
+import {
+  createUserScopedSupabaseClient,
+  getAuthenticatedUser,
+  getBearerToken,
+} from '@/lib/auth-server'
 
 export async function POST(request: NextRequest) {
   try {
+    const authUser = await getAuthenticatedUser(request)
+    const token = getBearerToken(request)
+
+    if (!authUser?.id || !token) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const hasServiceKey = Boolean(getSupabaseServiceKey())
+    const db = hasServiceKey ? getSupabaseAdmin() : createUserScopedSupabaseClient(token)
+
     const body = await request.json()
     const { userId, preferences, timezone, onboarding_completed } = body
+    const targetUserId = userId || authUser.id
 
-    if (!userId) {
+    if (!targetUserId) {
       return NextResponse.json(
         { error: 'User ID is required' },
         { status: 400 }
       )
     }
 
+    if (targetUserId !== authUser.id) {
+      return NextResponse.json(
+        { error: 'Forbidden' },
+        { status: 403 }
+      )
+    }
+
     // Get user's current tier for validation
-    const { data: user, error: userError } = await supabaseAdmin
+    const { data: user, error: userError } = await db
       .from('users')
       .select('subscription_tier')
-      .eq('id', userId)
+      .eq('id', targetUserId)
       .single()
 
     if (userError || !user) {
@@ -71,10 +97,10 @@ export async function POST(request: NextRequest) {
       updateData.onboarding_completed = onboarding_completed
     }
 
-    const { error } = await supabaseAdmin
+    const { error } = await db
       .from('users')
       .update(updateData)
-      .eq('id', userId)
+      .eq('id', targetUserId)
 
     if (error) {
       console.error('Failed to update preferences:', error)
@@ -96,20 +122,41 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    const authUser = await getAuthenticatedUser(request)
+    const token = getBearerToken(request)
+
+    if (!authUser?.id || !token) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const hasServiceKey = Boolean(getSupabaseServiceKey())
+    const db = hasServiceKey ? getSupabaseAdmin() : createUserScopedSupabaseClient(token)
+
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
+    const targetUserId = userId || authUser.id
 
-    if (!userId) {
+    if (!targetUserId) {
       return NextResponse.json(
         { error: 'User ID is required' },
         { status: 400 }
       )
     }
 
-    const { data, error } = await supabaseAdmin
+    if (targetUserId !== authUser.id) {
+      return NextResponse.json(
+        { error: 'Forbidden' },
+        { status: 403 }
+      )
+    }
+
+    const { data, error } = await db
       .from('users')
       .select('preferences, timezone, onboarding_completed, subscription_tier')
-      .eq('id', userId)
+      .eq('id', targetUserId)
       .single()
 
     if (error) {

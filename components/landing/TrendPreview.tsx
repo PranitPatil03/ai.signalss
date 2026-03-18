@@ -2,22 +2,22 @@ import { Sparkles, Cpu, Wrench, BookOpen, Flame } from 'lucide-react'
 
 const sampleTrends = [
   {
-    title: "Claude's new computer use is wild",
+    title: 'Claude computer-use got a major reliability bump',
     category: 'models',
-    summary: "Anthropic just dropped computer use capabilities. Claude can now literally use your computer, click buttons, and fill forms. It's like giving AI hands.",
-    tiktok_angle: "POV: You just gave an AI access to your computer and it's better at it than you are",
+    summary: 'The latest update improves task completion on multi-step browser flows. Great fit for QA automation and repetitive ops tasks.',
+    tiktok_angle: 'Build idea: automate release checklist verification with agent computer-use.',
   },
   {
-    title: "Open source catches up (again)",
+    title: 'Open-source coding models closed the gap this week',
     category: 'tools',
-    summary: "Llama 4 benchmarks leaked and it's beating GPT-4 on coding. Meta really said 'free for everyone' while OpenAI charges $200/month.",
-    tiktok_angle: "That feeling when free AI beats the $200/month version",
+    summary: 'Several OSS models now match paid tools on common repo-level tasks. Teams can reduce inference cost with smart routing.',
+    tiktok_angle: 'Migration playbook: route unit-test generation to OSS, keep premium for architecture tasks.',
   },
   {
-    title: "The AI job drama continues",
+    title: 'AI framework updates changed agent orchestration defaults',
     category: 'drama',
-    summary: "Another OpenAI researcher quit and subtweeted about 'safety concerns'. Twitter is having a field day. Popcorn recommended.",
-    tiktok_angle: "OpenAI employees keep quitting and I'm running out of popcorn",
+    summary: 'New defaults improve tool-calling reliability but can break older prompts. You may need to update system instructions and retries.',
+    tiktok_angle: 'Quick win: add structured tool schema validation before deploy.',
   },
 ]
 
@@ -80,7 +80,7 @@ export function TrendPreview() {
         </div>
 
         {/* Fade effect */}
-        <div className="h-20 bg-gradient-to-t from-surface-elevated to-transparent -mt-20 relative pointer-events-none" />
+        <div className="h-20 bg-linear-to-t from-surface-elevated to-transparent -mt-20 relative pointer-events-none" />
       </div>
     </div>
   )

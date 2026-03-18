@@ -1,5 +1,7 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+
+export const dynamic = 'force-dynamic'
 
 const sampleTrends = [
   {
@@ -116,8 +118,25 @@ Real talk though - are you team "one AI for everything" or do you prefer special
   },
 ]
 
-export async function GET() {
+export async function POST(request: NextRequest) {
   try {
+    if (process.env.NODE_ENV === 'production') {
+      return NextResponse.json(
+        { error: 'Not found' },
+        { status: 404 }
+      )
+    }
+
+    const authHeader = request.headers.get('authorization')
+    const seedSecret = process.env.SEED_SECRET || process.env.MIGRATION_SECRET
+
+    if (!seedSecret || authHeader !== `Bearer ${seedSecret}`) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const today = new Date().toISOString().split('T')[0]
 
     // Clear existing trends for today
@@ -153,4 +172,11 @@ export async function GET() {
       { status: 500 }
     )
   }
+}
+
+export async function GET() {
+  return NextResponse.json(
+    { error: 'Method not allowed' },
+    { status: 405 }
+  )
 }

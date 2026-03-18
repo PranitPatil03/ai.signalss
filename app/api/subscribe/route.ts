@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
+  if (process.env.ENABLE_LEGACY_SUBSCRIBE === 'true') {
+    // Legacy fallback remains available only when explicitly enabled.
+  } else {
+    return NextResponse.json(
+      {
+        error: 'Legacy subscribe endpoint is disabled. Use Supabase Auth sign-up/sign-in.',
+      },
+      { status: 410 }
+    )
+  }
+
   try {
     const { email } = await request.json()
 

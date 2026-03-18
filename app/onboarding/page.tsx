@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Sparkles, ArrowRight, ArrowLeft, Check, Loader2 } from 'lucide-react'
-import { ContentStyle, DEFAULT_PREFERENCES } from '@/lib/supabase'
+import { ContentStyle } from '@/lib/supabase'
+import { getAuthHeaders, syncCurrentUserProfile } from '@/lib/auth-client'
 
 const TOPIC_OPTIONS = [
   { id: 'ai', label: 'AI & Machine Learning', keywords: ['AI', 'machine learning', 'LLM', 'neural network'] },
@@ -47,8 +48,8 @@ const TIMEZONES = [
 
 function OnboardingContent() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const userId = searchParams.get('user')
+  const [userId, setUserId] = useState<string | null>(null)
+  const [isAuthLoading, setIsAuthLoading] = useState(true)
 
   const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -61,6 +62,27 @@ function OnboardingContent() {
   const [contentStyle, setContentStyle] = useState<ContentStyle>('tiktok')
   const [digestTime, setDigestTime] = useState('07:00')
   const [timezone, setTimezone] = useState('America/Los_Angeles')
+
+  useEffect(() => {
+    const bootstrap = async () => {
+      try {
+        const profile = await syncCurrentUserProfile()
+
+        if (profile.onboarding_completed) {
+          router.replace('/dashboard')
+          return
+        }
+
+        setUserId(profile.userId)
+      } catch {
+        router.replace('/')
+      } finally {
+        setIsAuthLoading(false)
+      }
+    }
+
+    bootstrap()
+  }, [router])
 
   const toggleTopic = (id: string) => {
     setSelectedTopics(prev =>
@@ -105,9 +127,10 @@ function OnboardingContent() {
     }
 
     try {
+      const headers = await getAuthHeaders()
       const response = await fetch('/api/user/preferences', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           userId,
           preferences,
@@ -130,6 +153,14 @@ function OnboardingContent() {
     }
   }
 
+  if (isAuthLoading) {
+    return (
+      <main className="min-h-screen bg-surface flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-electric" />
+      </main>
+    )
+  }
+
   return (
     <main className="min-h-screen bg-surface flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
@@ -147,9 +178,8 @@ function OnboardingContent() {
           {[1, 2, 3].map(s => (
             <div
               key={s}
-              className={`w-3 h-3 rounded-full transition-colors ${
-                s === step ? 'bg-electric' : s < step ? 'bg-green-500' : 'bg-surface-hover'
-              }`}
+              className={`w-3 h-3 rounded-full transition-colors ${s === step ? 'bg-electric' : s < step ? 'bg-green-500' : 'bg-surface-hover'
+                }`}
             />
           ))}
         </div>
@@ -170,18 +200,16 @@ function OnboardingContent() {
                   <button
                     key={option.id}
                     onClick={() => toggleTopic(option.id)}
-                    className={`p-3 rounded-lg border text-left transition-colors ${
-                      selectedTopics.includes(option.id)
+                    className={`p-3 rounded-lg border text-left transition-colors ${selectedTopics.includes(option.id)
                         ? 'border-electric bg-electric/10 text-text-primary'
                         : 'border-border hover:border-text-muted text-text-secondary'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2">
-                      <div className={`w-5 h-5 rounded border flex items-center justify-center ${
-                        selectedTopics.includes(option.id)
+                      <div className={`w-5 h-5 rounded border flex items-center justify-center ${selectedTopics.includes(option.id)
                           ? 'bg-electric border-electric'
                           : 'border-border'
-                      }`}>
+                        }`}>
                         {selectedTopics.includes(option.id) && (
                           <Check className="w-3 h-3 text-white" />
                         )}
@@ -238,18 +266,16 @@ function OnboardingContent() {
                   <button
                     key={option.id}
                     onClick={() => toggleSubreddit(option.id)}
-                    className={`p-2 rounded-lg border text-left transition-colors ${
-                      selectedSubreddits.includes(option.id)
+                    className={`p-2 rounded-lg border text-left transition-colors ${selectedSubreddits.includes(option.id)
                         ? 'border-electric bg-electric/10'
                         : 'border-border hover:border-text-muted'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2">
-                      <div className={`w-4 h-4 rounded border flex items-center justify-center ${
-                        selectedSubreddits.includes(option.id)
+                      <div className={`w-4 h-4 rounded border flex items-center justify-center ${selectedSubreddits.includes(option.id)
                           ? 'bg-electric border-electric'
                           : 'border-border'
-                      }`}>
+                        }`}>
                         {selectedSubreddits.includes(option.id) && (
                           <Check className="w-2.5 h-2.5 text-white" />
                         )}
@@ -279,18 +305,16 @@ function OnboardingContent() {
                   <button
                     key={style.id}
                     onClick={() => setContentStyle(style.id)}
-                    className={`p-4 rounded-lg border text-left transition-colors ${
-                      contentStyle === style.id
+                    className={`p-4 rounded-lg border text-left transition-colors ${contentStyle === style.id
                         ? 'border-electric bg-electric/10'
                         : 'border-border hover:border-text-muted'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        contentStyle === style.id
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${contentStyle === style.id
                           ? 'border-electric'
                           : 'border-border'
-                      }`}>
+                        }`}>
                         {contentStyle === style.id && (
                           <div className="w-2.5 h-2.5 rounded-full bg-electric" />
                         )}
@@ -390,18 +414,6 @@ function OnboardingContent() {
   )
 }
 
-function LoadingFallback() {
-  return (
-    <main className="min-h-screen bg-surface flex items-center justify-center">
-      <Loader2 className="w-8 h-8 animate-spin text-electric" />
-    </main>
-  )
-}
-
 export default function OnboardingPage() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <OnboardingContent />
-    </Suspense>
-  )
+  return <OnboardingContent />
 }

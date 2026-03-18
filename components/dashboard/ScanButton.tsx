@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { getAuthHeaders } from '@/lib/auth-client'
 
 interface ScanButtonProps {
   variant?: 'primary' | 'secondary'
@@ -24,8 +25,10 @@ export function ScanButton({
     setError(null)
 
     try {
+      const headers = await getAuthHeaders()
       const response = await fetch('/api/scan', {
         method: 'POST',
+        headers,
       })
 
       if (!response.ok) {

@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
+  if (process.env.ENABLE_LEGACY_SUBSCRIBE !== 'true') {
+    return NextResponse.redirect(new URL('/?error=legacy_verification_disabled', request.url))
+  }
+
   try {
     const { searchParams } = new URL(request.url)
     const token = searchParams.get('token')

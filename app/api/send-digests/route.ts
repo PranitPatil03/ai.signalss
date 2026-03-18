@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin, UserPreferences, DEFAULT_PREFERENCES, Trend } from '@/lib/supabase'
 import { sendDigestEmail } from '@/lib/resend'
+import { authorizeCronOrAdmin } from '@/lib/admin-auth'
 
 export const maxDuration = 300 // Allow up to 5 minutes for sending all emails
 
@@ -9,6 +10,7 @@ interface UserWithPreferences {
   email: string
   timezone: string
   preferences: UserPreferences
+  subscription_tier: 'free' | 'pro'
 }
 
 // Check if it's the right time to send a digest to this user
@@ -69,15 +71,11 @@ function personalizeTrends(trends: Trend[], preferences: UserPreferences): Trend
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify cron secret for automated runs
-    const authHeader = request.headers.get('authorization')
-    const cronSecret = process.env.CRON_SECRET
-    const isVercelCron = request.headers.get('x-vercel-cron') === '1'
-
-    if (isVercelCron && cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    const auth = await authorizeCronOrAdmin(request)
+    if (!auth.ok) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
+        { error: auth.error },
+        { status: auth.status }
       )
     }
 
@@ -109,7 +107,7 @@ export async function POST(request: NextRequest) {
     // Get all verified users with their preferences
     const { data: users, error: usersError } = await supabaseAdmin
       .from('users')
-      .select('id, email, timezone, preferences')
+      .select('id, email, timezone, preferences, subscription_tier')
       .eq('verified', true)
 
     if (usersError || !users || users.length === 0) {
@@ -126,6 +124,11 @@ export async function POST(request: NextRequest) {
     let skipped = 0
     let failed = 0
 
+    const startOfDay = new Date()
+    startOfDay.setUTCHours(0, 0, 0, 0)
+    const endOfDay = new Date(startOfDay)
+    endOfDay.setUTCDate(endOfDay.getUTCDate() + 1)
+
     // Send personalized emails to users
     for (const user of users as UserWithPreferences[]) {
       // Check if it's the right time for this user (unless force sending)
@@ -136,6 +139,28 @@ export async function POST(request: NextRequest) {
 
       try {
         const userPrefs = user.preferences || DEFAULT_PREFERENCES
+
+        if (!forceSend) {
+          const { data: existingDigest, error: existingDigestError } = await supabaseAdmin
+            .from('digests')
+            .select('id')
+            .eq('user_id', user.id)
+            .gte('sent_at', startOfDay.toISOString())
+            .lt('sent_at', endOfDay.toISOString())
+            .limit(1)
+            .maybeSingle()
+
+          if (existingDigestError) {
+            console.error(`Failed to check existing digest for ${user.email}:`, existingDigestError)
+            failed++
+            continue
+          }
+
+          if (existingDigest) {
+            skipped++
+            continue
+          }
+        }
 
         // Personalize trends for this user
         const personalizedTrends = personalizeTrends(allTrends, userPrefs)
@@ -157,7 +182,13 @@ export async function POST(request: NextRequest) {
         }
 
         // Send the personalized email
-        await sendDigestEmail(user.email, personalizedTrends, digest.id)
+        await sendDigestEmail(
+          user.email,
+          personalizedTrends,
+          digest.id,
+          user.id,
+          user.subscription_tier || 'free'
+        )
         sent++
 
         console.log(`Sent digest to ${user.email} (${personalizedTrends.length} trends)`)
@@ -188,7 +219,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Support GET for easier testing
-export async function GET(request: NextRequest) {
-  return POST(request)
+export async function GET() {
+  return NextResponse.json(
+    { error: 'Method not allowed' },
+    { status: 405 }
+  )
 }

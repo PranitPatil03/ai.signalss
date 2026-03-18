@@ -2,22 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { scanTrendsWithBreakdown } from '@/lib/scanner'
 import { isDuplicate } from '@/lib/utils'
+import { authorizeCronOrAdmin } from '@/lib/admin-auth'
 
 export const maxDuration = 120 // Allow up to 2 minutes for scanning (more sources now)
 
 export async function POST(request: NextRequest) {
   try {
-    // For Vercel cron jobs, verify the secret
-    // Manual dashboard triggers are allowed without auth
-    const authHeader = request.headers.get('authorization')
-    const cronSecret = process.env.CRON_SECRET
-    const isVercelCron = request.headers.get('x-vercel-cron') === '1'
-
-    // Only require auth for Vercel cron jobs (not manual dashboard triggers)
-    if (isVercelCron && cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    const auth = await authorizeCronOrAdmin(request)
+    if (!auth.ok) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
+        { error: auth.error },
+        { status: auth.status }
       )
     }
 
@@ -120,7 +115,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Also support GET for easier testing
-export async function GET(request: NextRequest) {
-  return POST(request)
+export async function GET() {
+  return NextResponse.json(
+    { error: 'Method not allowed' },
+    { status: 405 }
+  )
 }

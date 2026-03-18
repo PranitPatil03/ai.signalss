@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Sparkles, ArrowLeft, Save, Plus, X, Check, Loader2, Lock, Crown } from 'lucide-react'
 import { ContentStyle, DEFAULT_PREFERENCES, UserPreferences } from '@/lib/supabase'
 import { PLANS } from '@/lib/stripe'
+import { getAuthHeaders, syncCurrentUserProfile } from '@/lib/auth-client'
 
 const SUBREDDIT_OPTIONS = [
   { id: 'LocalLLaMA', label: 'r/LocalLLaMA' },
@@ -40,8 +40,7 @@ const TIMEZONES = [
 ]
 
 function SettingsContent() {
-  const searchParams = useSearchParams()
-  const userId = searchParams.get('user')
+  const [userId, setUserId] = useState<string | null>(null)
 
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -62,17 +61,25 @@ function SettingsContent() {
   const [timezone, setTimezone] = useState('America/Los_Angeles')
 
   useEffect(() => {
-    if (userId) {
-      fetchPreferences()
-    } else {
-      setIsLoading(false)
-      setError('No user ID provided. Please sign in again.')
+    const bootstrap = async () => {
+      try {
+        const profile = await syncCurrentUserProfile()
+        setUserId(profile.userId)
+        await fetchPreferences()
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Please sign in again.')
+      } finally {
+        setIsLoading(false)
+      }
     }
-  }, [userId])
+
+    bootstrap()
+  }, [])
 
   const fetchPreferences = async () => {
     try {
-      const response = await fetch(`/api/user/preferences?userId=${userId}`)
+      const headers = await getAuthHeaders()
+      const response = await fetch('/api/user/preferences', { headers })
       if (!response.ok) throw new Error('Failed to fetch preferences')
 
       const data = await response.json()
@@ -87,8 +94,6 @@ function SettingsContent() {
       setUserTier(data.subscription_tier || 'free')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load settings')
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -97,10 +102,10 @@ function SettingsContent() {
 
     setIsUpgrading(true)
     try {
+      const headers = await getAuthHeaders()
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
+        headers,
       })
 
       if (!response.ok) throw new Error('Failed to create checkout session')
@@ -150,9 +155,10 @@ function SettingsContent() {
         content_style: contentStyle,
       }
 
+      const headers = await getAuthHeaders()
       const response = await fetch('/api/user/preferences', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ userId, preferences, timezone }),
       })
 
@@ -250,7 +256,7 @@ function SettingsContent() {
               <button
                 onClick={handleUpgrade}
                 disabled={isUpgrading}
-                className="flex-shrink-0 flex items-center gap-2 px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-black text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+                className="shrink-0 flex items-center gap-2 px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-black text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
               >
                 {isUpgrading ? (
                   <Loader2 className="w-3 h-3 animate-spin" />
@@ -308,18 +314,16 @@ function SettingsContent() {
                 <button
                   key={option.id}
                   onClick={() => toggleSubreddit(option.id)}
-                  className={`p-2 rounded-lg border text-left transition-colors ${
-                    subreddits.includes(option.id)
+                  className={`p-2 rounded-lg border text-left transition-colors ${subreddits.includes(option.id)
                       ? 'border-electric bg-electric/10 text-text-primary'
                       : 'border-border hover:border-text-muted text-text-secondary'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2">
-                    <div className={`w-4 h-4 rounded border flex items-center justify-center ${
-                      subreddits.includes(option.id)
+                    <div className={`w-4 h-4 rounded border flex items-center justify-center ${subreddits.includes(option.id)
                         ? 'bg-electric border-electric'
                         : 'border-border'
-                    }`}>
+                      }`}>
                       {subreddits.includes(option.id) && (
                         <Check className="w-2.5 h-2.5 text-white" />
                       )}
@@ -393,18 +397,16 @@ function SettingsContent() {
                       setError(null)
                       setErrorIsUpgradeable(false)
                     }}
-                    className={`p-3 rounded-lg border text-left transition-colors relative ${
-                      contentStyle === style.id
+                    className={`p-3 rounded-lg border text-left transition-colors relative ${contentStyle === style.id
                         ? 'border-electric bg-electric/10'
                         : locked
-                        ? 'border-border opacity-60 cursor-not-allowed'
-                        : 'border-border hover:border-text-muted'
-                    }`}
+                          ? 'border-border opacity-60 cursor-not-allowed'
+                          : 'border-border hover:border-text-muted'
+                      }`}
                   >
                     <div className="flex items-center gap-2">
-                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                        contentStyle === style.id ? 'border-electric' : 'border-border'
-                      }`}>
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${contentStyle === style.id ? 'border-electric' : 'border-border'
+                        }`}>
                         {contentStyle === style.id && (
                           <div className="w-2 h-2 rounded-full bg-electric" />
                         )}
@@ -473,9 +475,9 @@ function SettingsContent() {
         {/* Upgrade to Pro Section */}
         {userTier === 'free' && (
           <section className="mb-8">
-            <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl p-6">
+            <div className="bg-linear-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl p-6">
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <Crown className="w-8 h-8 text-yellow-400" />
                 </div>
                 <div className="flex-1">
@@ -511,13 +513,12 @@ function SettingsContent() {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
-              saveStatus === 'saved'
+            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${saveStatus === 'saved'
                 ? 'bg-green-500 text-white'
                 : saveStatus === 'error'
-                ? 'bg-red-500 text-white'
-                : 'bg-electric hover:bg-electric-dark text-white'
-            } disabled:opacity-50`}
+                  ? 'bg-red-500 text-white'
+                  : 'bg-electric hover:bg-electric-dark text-white'
+              } disabled:opacity-50`}
           >
             {isSaving ? (
               <>
@@ -542,18 +543,6 @@ function SettingsContent() {
   )
 }
 
-function LoadingFallback() {
-  return (
-    <main className="min-h-screen bg-surface flex items-center justify-center">
-      <Loader2 className="w-8 h-8 animate-spin text-electric" />
-    </main>
-  )
-}
-
 export default function SettingsPage() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <SettingsContent />
-    </Suspense>
-  )
+  return <SettingsContent />
 }

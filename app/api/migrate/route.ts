@@ -2,9 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request: NextRequest) {
+  if (process.env.NODE_ENV === 'production' && process.env.ALLOW_RUNTIME_MIGRATIONS !== 'true') {
+    return NextResponse.json(
+      { error: 'Runtime migrations are disabled in production' },
+      { status: 403 }
+    )
+  }
+
   // Require a secret to run migrations
   const authHeader = request.headers.get('authorization')
-  const migrationSecret = process.env.MIGRATION_SECRET || process.env.CRON_SECRET
+  const migrationSecret = process.env.MIGRATION_SECRET
 
   if (!migrationSecret || authHeader !== `Bearer ${migrationSecret}`) {
     return NextResponse.json(
@@ -42,9 +49,6 @@ export async function POST(request: NextRequest) {
       const { error } = await supabase.rpc('exec_sql', { sql_query: sql })
 
       if (error) {
-        // Try direct query if rpc doesn't exist
-        const { error: directError } = await supabase.from('_migrations').select('*').limit(0)
-
         results.push({
           sql: sql.substring(0, 50) + '...',
           success: false,

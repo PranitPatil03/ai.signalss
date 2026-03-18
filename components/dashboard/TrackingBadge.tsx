@@ -1,31 +1,34 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import { Target } from 'lucide-react'
 import { DEFAULT_PREFERENCES } from '@/lib/supabase'
+import { getAuthHeaders, getClientAccessToken } from '@/lib/auth-client'
 
-function TrackingBadgeContent() {
-  const searchParams = useSearchParams()
-  const userId = searchParams.get('user')
+export function TrackingBadge() {
   const [topics, setTopics] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (userId) {
-      fetchTopics()
-    } else {
-      setTopics(DEFAULT_PREFERENCES.topics.slice(0, 3))
-      setIsLoading(false)
-    }
-  }, [userId])
+    fetchTopics()
+  }, [])
 
   const fetchTopics = async () => {
     try {
-      const response = await fetch(`/api/user/preferences?userId=${userId}`)
+      const token = await getClientAccessToken()
+
+      if (!token) {
+        setTopics(DEFAULT_PREFERENCES.topics.slice(0, 3))
+        return
+      }
+
+      const headers = await getAuthHeaders()
+      const response = await fetch('/api/user/preferences', { headers })
       if (response.ok) {
         const data = await response.json()
         setTopics(data.preferences?.topics || DEFAULT_PREFERENCES.topics)
+      } else {
+        setTopics(DEFAULT_PREFERENCES.topics)
       }
     } catch {
       setTopics(DEFAULT_PREFERENCES.topics)
@@ -50,13 +53,5 @@ function TrackingBadgeContent() {
         {hasMore && ` +${topics.length - 3} more`}
       </span>
     </div>
-  )
-}
-
-export function TrackingBadge() {
-  return (
-    <Suspense fallback={null}>
-      <TrackingBadgeContent />
-    </Suspense>
   )
 }
