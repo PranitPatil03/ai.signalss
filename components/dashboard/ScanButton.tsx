@@ -51,8 +51,8 @@ export function ScanButton({
 
   const baseStyles = "inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
   const variantStyles = variant === 'primary'
-    ? "bg-emerald-500 hover:bg-emerald-400 text-white"
-    : "bg-white/5 hover:bg-white/10 border border-white/[0.08] text-zinc-300"
+    ? "bg-gradient-to-b from-blue-400 to-blue-600 text-white shadow-[0_4px_14px_rgba(37,99,235,0.4)]"
+    : "bg-white hover:bg-gray-50 border border-gray-200 text-gray-600"
 
   return (
     <div className="flex flex-col items-center gap-2">

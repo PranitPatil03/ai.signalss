@@ -122,16 +122,12 @@ function SettingsContent() {
     }
   }
 
-  const isFeatureLocked = (feature: 'style' | 'topics' | 'digestTime', value?: string | number): boolean => {
+  const isFeatureLocked = (feature: 'style' | 'digestTime', value?: string): boolean => {
     if (userTier === 'pro') return false
 
     if (feature === 'style' && value) {
       const style = DIGEST_FORMATS.find(s => s.id === value)
       return style?.proOnly || false
-    }
-
-    if (feature === 'topics' && typeof value === 'number') {
-      return value > PLANS.free.limits.topics
     }
 
     if (feature === 'digestTime') {
@@ -177,11 +173,6 @@ function SettingsContent() {
 
   const addTopic = () => {
     if (newTopic.trim() && !topics.includes(newTopic.trim())) {
-      if (isFeatureLocked('topics', topics.length + 1)) {
-        setError(`Free plan limited to ${PLANS.free.limits.topics} topics.`)
-        setErrorIsUpgradeable(true)
-        return
-      }
       setTopics([...topics, newTopic.trim()])
       setNewTopic('')
       setError(null)
@@ -213,19 +204,19 @@ function SettingsContent() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#09090b] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
+      <main className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
       </main>
     )
   }
 
   if (!userId) {
     return (
-      <main className="min-h-screen bg-[#09090b] flex items-center justify-center p-4">
+      <main className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-4">
         <div className="text-center">
-          <h1 className="text-xl font-semibold text-white mb-2">Sign in required</h1>
-          <p className="text-zinc-400 mb-4">Please sign up or sign in to access settings.</p>
-          <Link href="/" className="text-emerald-400 hover:text-emerald-300">
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">Sign in required</h1>
+          <p className="text-gray-500 mb-4">Please sign up or sign in to access settings.</p>
+          <Link href="/" className="text-blue-500 hover:text-blue-600">
             Go to homepage
           </Link>
         </div>
@@ -234,25 +225,25 @@ function SettingsContent() {
   }
 
   return (
-    <main className="min-h-screen bg-[#09090b]">
+    <main className="min-h-screen bg-[#f8fafc]">
       {/* Header */}
-      <header className="border-b border-white/[0.06] bg-[#111113]">
+      <header className="border-b border-gray-200 bg-white">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
+          <Link href="/dashboard" className="flex items-center gap-2 text-gray-400 hover:text-gray-900 transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
           </Link>
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-emerald-400" />
-            <span className="font-semibold text-white">Settings</span>
+            <Sparkles className="w-5 h-5 text-blue-500" />
+            <span className="font-semibold text-gray-900">Settings</span>
           </div>
         </div>
       </header>
 
       <div className="max-w-3xl mx-auto px-4 py-8">
         {error && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center justify-between gap-4">
-            <span className="text-red-400 text-sm">{error}</span>
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between gap-4">
+            <span className="text-red-600 text-sm">{error}</span>
             {errorIsUpgradeable && userTier === 'free' && (
               <button
                 onClick={handleUpgrade}
@@ -272,16 +263,16 @@ function SettingsContent() {
 
         {/* Topics Section */}
         <section className="mb-8">
-          <h2 className="text-lg font-semibold text-white mb-4">Topics to Track</h2>
-          <div className="rounded-xl border border-white/[0.06] bg-[#111113] p-5">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Topics to Track</h2>
+          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div className="flex flex-wrap gap-2 mb-4">
               {topics.map(topic => (
                 <span
                   key={topic}
-                  className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-sm text-emerald-400 flex items-center gap-2"
+                  className="px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-full text-sm text-blue-600 flex items-center gap-2"
                 >
                   {topic}
-                  <button onClick={() => removeTopic(topic)} className="hover:text-white transition-colors">
+                  <button onClick={() => removeTopic(topic)} className="hover:text-blue-800 transition-colors">
                     <X className="w-3 h-3" />
                   </button>
                 </span>
@@ -294,11 +285,11 @@ function SettingsContent() {
                 onChange={(e) => setNewTopic(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && addTopic()}
                 placeholder="Add a topic (e.g., 'computer vision')"
-                className="flex-1 px-3 py-2 bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/40"
+                className="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-400"
               />
               <button
                 onClick={addTopic}
-                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-gradient-to-b from-blue-400 to-blue-600 text-white rounded-lg transition-colors"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -308,22 +299,22 @@ function SettingsContent() {
 
         {/* Subreddits Section */}
         <section className="mb-8">
-          <h2 className="text-lg font-semibold text-white mb-4">Subreddits to Scan</h2>
-          <div className="rounded-xl border border-white/[0.06] bg-[#111113] p-5">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Subreddits to Scan</h2>
+          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {SUBREDDIT_OPTIONS.map(option => (
                 <button
                   key={option.id}
                   onClick={() => toggleSubreddit(option.id)}
                   className={`p-2 rounded-lg border text-left transition-all ${subreddits.includes(option.id)
-                      ? 'border-emerald-500/30 bg-emerald-500/10 text-white'
-                      : 'border-white/[0.06] hover:border-white/[0.12] text-zinc-400'
+                    ? 'border-blue-300 bg-blue-50 text-gray-900'
+                    : 'border-gray-200 hover:border-gray-300 text-gray-500'
                     }`}
                 >
                   <div className="flex items-center gap-2">
                     <div className={`w-4 h-4 rounded border flex items-center justify-center ${subreddits.includes(option.id)
-                        ? 'bg-emerald-500 border-emerald-500'
-                        : 'border-zinc-600'
+                      ? 'bg-blue-500 border-blue-500'
+                      : 'border-gray-300'
                       }`}>
                       {subreddits.includes(option.id) && (
                         <Check className="w-2.5 h-2.5 text-white" />
@@ -339,20 +330,20 @@ function SettingsContent() {
 
         {/* Trusted Authors Section */}
         <section className="mb-8">
-          <h2 className="text-lg font-semibold text-white mb-2">Trusted Authors</h2>
-          <p className="text-zinc-500 text-sm mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Trusted Authors</h2>
+          <p className="text-gray-400 text-sm mb-4">
             Content from these accounts gets a 2x boost in your digest rankings.
           </p>
-          <div className="rounded-xl border border-white/[0.06] bg-[#111113] p-5">
+          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             {trustedAuthors.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
                 {trustedAuthors.map(author => (
                   <span
                     key={author}
-                    className="px-3 py-1.5 bg-white/5 border border-white/[0.08] rounded-full text-sm text-zinc-300 flex items-center gap-2"
+                    className="px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-full text-sm text-gray-700 flex items-center gap-2"
                   >
                     @{author}
-                    <button onClick={() => removeAuthor(author)} className="text-zinc-500 hover:text-red-400 transition-colors">
+                    <button onClick={() => removeAuthor(author)} className="text-gray-400 hover:text-red-500 transition-colors">
                       <X className="w-3 h-3" />
                     </button>
                   </span>
@@ -366,11 +357,11 @@ function SettingsContent() {
                 onChange={(e) => setNewAuthor(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && addAuthor()}
                 placeholder="@username (e.g., @karpathy)"
-                className="flex-1 px-3 py-2 bg-white/[0.03] border border-white/[0.08] rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/40"
+                className="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-400"
               />
               <button
                 onClick={addAuthor}
-                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-gradient-to-b from-blue-400 to-blue-600 text-white rounded-lg transition-colors"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -380,8 +371,8 @@ function SettingsContent() {
 
         {/* Digest Format Section */}
         <section className="mb-8">
-          <h2 className="text-lg font-semibold text-white mb-4">Digest Format</h2>
-          <div className="rounded-xl border border-white/[0.06] bg-[#111113] p-5">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Digest Format</h2>
+          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div className="grid sm:grid-cols-2 gap-3">
               {DIGEST_FORMATS.map(format => {
                 const locked = isFeatureLocked('style', format.id)
@@ -399,25 +390,25 @@ function SettingsContent() {
                       setErrorIsUpgradeable(false)
                     }}
                     className={`p-3 rounded-xl border text-left transition-all relative ${contentStyle === format.id
-                        ? 'border-emerald-500/30 bg-emerald-500/10'
-                        : locked
-                          ? 'border-white/[0.04] opacity-50 cursor-not-allowed'
-                          : 'border-white/[0.06] hover:border-white/[0.12]'
+                      ? 'border-blue-300 bg-blue-50'
+                      : locked
+                        ? 'border-gray-100 opacity-50 cursor-not-allowed'
+                        : 'border-gray-200 hover:border-gray-300'
                       }`}
                   >
                     <div className="flex items-center gap-2">
-                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${contentStyle === format.id ? 'border-emerald-400' : 'border-zinc-600'
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${contentStyle === format.id ? 'border-blue-500' : 'border-gray-300'
                         }`}>
                         {contentStyle === format.id && (
-                          <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                          <div className="w-2 h-2 rounded-full bg-blue-500" />
                         )}
                       </div>
                       <div className="flex-1">
-                        <div className="font-medium text-white flex items-center gap-2">
+                        <div className="font-medium text-gray-900 flex items-center gap-2">
                           {format.label}
-                          {locked && <Lock className="w-3 h-3 text-zinc-500" />}
+                          {locked && <Lock className="w-3 h-3 text-gray-400" />}
                         </div>
-                        <div className="text-xs text-zinc-500">{format.description}</div>
+                        <div className="text-xs text-gray-500">{format.description}</div>
                       </div>
                     </div>
                   </button>
@@ -430,18 +421,18 @@ function SettingsContent() {
         {/* Delivery Time Section */}
         <section className="mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-lg font-semibold text-white">Delivery Time</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Delivery Time</h2>
             {isFeatureLocked('digestTime') && (
-              <span className="flex items-center gap-1 px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-xs text-amber-400">
+              <span className="flex items-center gap-1 px-2 py-0.5 bg-amber-50 border border-amber-200 rounded-full text-xs text-amber-600">
                 <Crown className="w-3 h-3" />
                 Pro
               </span>
             )}
           </div>
-          <div className={`rounded-xl border border-white/[0.06] bg-[#111113] p-5 ${isFeatureLocked('digestTime') ? 'opacity-50' : ''}`}>
+          <div className={`rounded-xl border border-gray-200 bg-white p-5 shadow-sm ${isFeatureLocked('digestTime') ? 'opacity-50' : ''}`}>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">Time</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Time</label>
                 <input
                   type="time"
                   value={digestTime}
@@ -454,18 +445,18 @@ function SettingsContent() {
                     setDigestTime(e.target.value)
                   }}
                   disabled={isFeatureLocked('digestTime')}
-                  className="w-full px-3 py-2 bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-emerald-500/40 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-blue-400 disabled:cursor-not-allowed"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">Timezone</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
                 <select
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
-                  className="w-full px-3 py-2 bg-white/[0.03] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:border-emerald-500/40"
+                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-blue-400"
                 >
                   {TIMEZONES.map(tz => (
-                    <option key={tz.id} value={tz.id} className="bg-[#111113] text-white">{tz.label}</option>
+                    <option key={tz.id} value={tz.id} className="bg-white text-gray-900">{tz.label}</option>
                   ))}
                 </select>
               </div>
@@ -476,14 +467,14 @@ function SettingsContent() {
         {/* Upgrade to Pro Section */}
         {userTier === 'free' && (
           <section className="mb-8">
-            <div className="rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-500/5 to-orange-500/5 p-6">
+            <div className="rounded-xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-6">
               <div className="flex items-start gap-4">
                 <div className="shrink-0">
-                  <Crown className="w-8 h-8 text-amber-400" />
+                  <Crown className="w-8 h-8 text-amber-500" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-white mb-2">Upgrade to Pro</h3>
-                  <p className="text-zinc-400 text-sm mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Upgrade to Pro</h3>
+                  <p className="text-gray-500 text-sm mb-4">
                     Unlock unlimited topics, all digest formats (Deep Dive, Professional Brief, Key Takeaways, Full Report), and custom delivery times.
                   </p>
                   <button
@@ -515,10 +506,10 @@ function SettingsContent() {
             onClick={handleSave}
             disabled={isSaving}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${saveStatus === 'saved'
-                ? 'bg-emerald-500 text-white'
-                : saveStatus === 'error'
-                  ? 'bg-red-500 text-white'
-                  : 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_0_20px_rgba(16,185,129,0.2)]'
+              ? 'bg-blue-500 text-white'
+              : saveStatus === 'error'
+                ? 'bg-red-500 text-white'
+                : 'bg-gradient-to-b from-blue-400 to-blue-600 text-white shadow-[0_4px_14px_rgba(37,99,235,0.4)]'
               } disabled:opacity-50`}
           >
             {isSaving ? (

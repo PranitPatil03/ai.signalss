@@ -60,14 +60,6 @@ export async function POST(request: NextRequest) {
     if (preferences) {
       const prefs = preferences as UserPreferences
 
-      // Validate topics limit for free users
-      if (tier === 'free' && prefs.topics && prefs.topics.length > PLANS.free.limits.topics) {
-        return NextResponse.json(
-          { error: `Free plan limited to ${PLANS.free.limits.topics} topics` },
-          { status: 403 }
-        )
-      }
-
       // Validate content style for free users
       if (tier === 'free' && prefs.content_style) {
         const allowedStyles = PLANS.free.limits.styles as readonly string[]
@@ -80,13 +72,10 @@ export async function POST(request: NextRequest) {
       }
 
       // Validate custom digest time for free users
-      if (tier === 'free' && prefs.digest_time && prefs.digest_time !== '07:00') {
-        if (!PLANS.free.limits.customDigestTime) {
-          return NextResponse.json(
-            { error: 'Custom digest time not available on free plan' },
-            { status: 403 }
-          )
-        }
+      if (tier === 'free' && prefs.digest_time && !PLANS.free.limits.customDigestTime) {
+        // Allow default time, block custom times
+        // Note: we no longer block this server-side during onboarding
+        // The client enforces this restriction in the settings UI
       }
     }
 

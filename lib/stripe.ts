@@ -19,7 +19,8 @@ export const PLANS = {
     name: 'Free',
     price: 0,
     limits: {
-      topics: 3,
+      topics: Infinity, // No limit on keywords — free/pro differ by formats & delivery
+      domains: 3,       // Max domain categories for free users
       styles: ['tiktok'] as const, // 'tiktok' = Quick Summary internally
       customDigestTime: false,
     },
@@ -30,6 +31,7 @@ export const PLANS = {
     priceId: process.env.STRIPE_PRO_PRICE_ID || '',
     limits: {
       topics: Infinity,
+      domains: Infinity, // Unlimited domain categories
       styles: ['tiktok', 'youtube', 'linkedin', 'twitter', 'newsletter'] as const, // All digest formats
       customDigestTime: true,
     },

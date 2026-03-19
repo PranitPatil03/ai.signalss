@@ -45,10 +45,10 @@ export function TrackingBadge() {
   const hasMore = topics.length > 3
 
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/[0.08] rounded-full text-xs text-zinc-400">
-      <Target className="w-3 h-3 text-emerald-400" />
+    <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-500">
+      <Target className="w-3 h-3 text-blue-500" />
       <span>Tracking:</span>
-      <span className="text-white">
+      <span className="text-gray-900">
         {displayTopics.join(', ')}
         {hasMore && ` +${topics.length - 3} more`}
       </span>

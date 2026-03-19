@@ -11,37 +11,36 @@ function UnsubscribedContent() {
   const error = searchParams.get('error')
 
   return (
-    <main className="min-h-screen bg-[#09090b] flex items-center justify-center p-4">
+    <main className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center">
         <div className="flex items-center justify-center gap-2 mb-8">
-          <Sparkles className="w-6 h-6 text-emerald-400" />
-          <span className="font-semibold text-white text-lg">AI Daily Updates</span>
+          <span className="text-xl font-normal tracking-tight text-gray-900">signalss</span>
         </div>
 
         {success ? (
           <>
-            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-green-500/20 flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-green-400" />
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-green-50 flex items-center justify-center">
+              <CheckCircle className="w-8 h-8 text-green-500" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-4">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
               You've been unsubscribed
             </h1>
-            <p className="text-zinc-400 mb-8">
+            <p className="text-gray-500 mb-8">
               You will no longer receive digest emails from us. We're sorry to see you go!
             </p>
-            <p className="text-zinc-500 text-sm mb-8">
+            <p className="text-gray-400 text-sm mb-8">
               Changed your mind? You can always sign up again from our homepage.
             </p>
           </>
         ) : (
           <>
-            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
-              <XCircle className="w-8 h-8 text-red-400" />
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-50 flex items-center justify-center">
+              <XCircle className="w-8 h-8 text-red-500" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-4">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
               Something went wrong
             </h1>
-            <p className="text-zinc-400 mb-8">
+            <p className="text-gray-500 mb-8">
               {error === 'invalid'
                 ? 'The unsubscribe link is invalid or has expired.'
                 : 'We couldn\'t process your unsubscribe request. Please try again or contact support.'}
@@ -51,7 +50,7 @@ function UnsubscribedContent() {
 
         <Link
           href="/"
-          className="inline-flex items-center gap-2 px-4 py-2 text-emerald-400 hover:text-emerald-300 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 text-blue-500 hover:text-blue-700 transition-colors"
         >
           Return to homepage
         </Link>

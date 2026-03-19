@@ -1,52 +1,64 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
 @import "tailwindcss";
 
-@theme {
-  --color-electric: #10b981;
-  --color-electric-dark: #059669;
-  --color-accent: #06b6d4;
-  --color-surface: #09090b;
-  --color-surface-elevated: #111113;
-  --color-surface-hover: #1a1a1e;
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-text-primary: #fafafa;
-  --color-text-secondary: #a1a1aa;
-  --color-text-muted: #71717a;
-}
-
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
+  --background: #f8fafc;
+  --foreground: #0f172a;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Geist', 'Segoe UI', sans-serif;
+  font-family: 'Geist', sans-serif;
 }
 
-@layer base {
-  * {
-    @apply border-border;
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - var(--gap) / 2));
   }
 }
 
-.gradient-text {
-  background: linear-gradient(135deg, #10b981 0%, #06b6d4 55%, #10b981 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(calc(-50% - var(--gap) / 2));
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
-.glow {
-  box-shadow: 0 0 40px rgba(16, 185, 129, 0.15);
+.animate-marquee {
+  animation: marquee var(--duration, 40s) linear infinite;
 }
 
-.card-hover {
-  transition: all 0.2s ease;
+.animate-marquee-reverse {
+  animation: marquee-reverse var(--duration, 40s) linear infinite;
 }
 
-.card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in-up-delay-1 {
+  animation: fade-in-up 0.6s ease-out 0.15s forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-2 {
+  animation: fade-in-up 0.6s ease-out 0.3s forwards;
+  opacity: 0;
 }
