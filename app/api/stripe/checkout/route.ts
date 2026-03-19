@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStripe, PLANS } from '@/lib/stripe'
-import { getSupabaseAdmin, getSupabaseServiceKey } from '@/lib/supabase'
-import {
-  createUserScopedSupabaseClient,
-  getAuthenticatedUser,
-  getBearerToken,
-} from '@/lib/auth-server'
+import { getSupabaseAdmin } from '@/lib/supabase'
+import { getAuthenticatedUser } from '@/lib/auth-server'
 
 export async function POST(request: NextRequest) {
   try {
     const authUser = await getAuthenticatedUser(request)
-    const token = getBearerToken(request)
 
-    if (!authUser?.id || !token) {
+    if (!authUser?.id || !authUser.email) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -20,8 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = authUser.id
-    const hasServiceKey = Boolean(getSupabaseServiceKey())
-    const db = hasServiceKey ? getSupabaseAdmin() : createUserScopedSupabaseClient(token)
+    const db = getSupabaseAdmin()
 
     // Get user from database
     const { data: user, error: userError } = await db
@@ -30,35 +24,39 @@ export async function POST(request: NextRequest) {
       .eq('id', userId)
       .single()
 
-    if (userError || !user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
+    // If user not found in DB, use auth email directly
+    const userEmail = user?.email || authUser.email
+
+    if (userError && userError.code !== 'PGRST116') {
+      console.error('Checkout user lookup error:', userError)
     }
 
     const stripe = getStripe()
-    let customerId = user.stripe_customer_id
+    let customerId = user?.stripe_customer_id
 
     // Create Stripe customer if doesn't exist
     if (!customerId) {
       const customer = await stripe.customers.create({
-        email: user.email,
+        email: userEmail,
         metadata: { userId },
       })
       customerId = customer.id
 
-      // Save customer ID to database
-      await db
-        .from('users')
-        .update({ stripe_customer_id: customerId })
-        .eq('id', userId)
+      // Try to save customer ID — column might not exist yet
+      try {
+        await db
+          .from('users')
+          .update({ stripe_customer_id: customerId })
+          .eq('id', userId)
+      } catch {
+        console.warn('Could not save stripe_customer_id — column may not exist')
+      }
     }
 
     // Check if price ID is configured
     if (!PLANS.pro.priceId) {
       return NextResponse.json(
-        { error: 'Stripe price ID not configured' },
+        { error: 'Stripe price ID not configured. Set STRIPE_PRO_PRICE_ID in your environment variables.' },
         { status: 500 }
       )
     }

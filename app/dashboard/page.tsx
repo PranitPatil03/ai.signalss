@@ -72,18 +72,20 @@ export default async function DashboardPage() {
       {/* Header */}
       <header className="bg-[#f8fafc]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <Image src="/images/logo.png" alt="signalss" width={24} height={24} className="rounded" />
-              <span className="text-xl font-normal tracking-tight text-gray-900">signalss</span>
-            </Link>
-            <TrackingBadge />
-          </div>
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/images/logo.png" alt="signalss" width={24} height={24} className="rounded" />
+            <span className="text-xl font-normal tracking-tight text-gray-900">signalss</span>
+          </Link>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-400 hidden sm:block">{today}</span>
+            <a
+              href="/api/stripe/checkout"
+              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-b from-blue-400 to-blue-600 text-white text-sm font-medium rounded-xl shadow-[0_4px_14px_rgba(37,99,235,0.4)] hover:opacity-90 transition-opacity"
+            >
+              <Zap className="w-3.5 h-3.5" />
+              Upgrade to Pro
+            </a>
             <SettingsLink />
             <LogoutButton />
-            <RefreshButton />
           </div>
         </div>
       </header>
@@ -130,9 +132,14 @@ export default async function DashboardPage() {
                   <h1 className="text-3xl font-bold text-gray-900 mb-1">
                     Today&apos;s AI Briefing
                   </h1>
+                  <p className="text-sm text-gray-400 mb-1">{today}</p>
                   <p className="text-gray-500">
                     {trends.length} signals from across the web
                   </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <TrackingBadge />
+                  <RefreshButton />
                 </div>
               </div>
 
