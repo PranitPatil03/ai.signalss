@@ -22,8 +22,16 @@ export async function authorizeCronOrAdmin(request: NextRequest): Promise<AdminA
   const authHeader = request.headers.get('authorization')
   const isVercelCron = request.headers.get('x-vercel-cron') === '1'
 
+  // Support cron secret via Bearer token (Supabase cron, Vercel cron, or manual)
+  const cronSecret = process.env.CRON_SECRET
+  if (cronSecret && authHeader === `Bearer ${cronSecret}`) {
+    return {
+      ok: true,
+      reason: 'cron',
+    }
+  }
+
   if (isVercelCron) {
-    const cronSecret = process.env.CRON_SECRET
     if (!cronSecret) {
       return {
         ok: false,
@@ -32,17 +40,10 @@ export async function authorizeCronOrAdmin(request: NextRequest): Promise<AdminA
       }
     }
 
-    if (authHeader !== `Bearer ${cronSecret}`) {
-      return {
-        ok: false,
-        status: 401,
-        error: 'Unauthorized',
-      }
-    }
-
     return {
-      ok: true,
-      reason: 'cron',
+      ok: false,
+      status: 401,
+      error: 'Unauthorized',
     }
   }
 

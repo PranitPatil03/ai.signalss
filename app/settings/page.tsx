@@ -46,6 +46,8 @@ const TIMEZONES = [
 function SettingsContent() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [userName, setUserName] = useState<string | null>(null)
 
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -70,6 +72,15 @@ function SettingsContent() {
       try {
         const profile = await syncCurrentUserProfile()
         setUserId(profile.userId)
+
+        // Fetch user email/name from Supabase auth
+        const supabase = getSupabaseBrowserClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          setUserEmail(user.email || null)
+          setUserName(user.user_metadata?.full_name || user.user_metadata?.name || null)
+        }
+
         await fetchPreferences()
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Please sign in again.')
@@ -248,6 +259,19 @@ function SettingsContent() {
       </header>
 
       <div className="max-w-3xl mx-auto px-4 py-8">
+        {/* User info */}
+        {(userEmail || userName) && (
+          <div className="mb-8 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-b from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
+              {(userName || userEmail || '?')[0].toUpperCase()}
+            </div>
+            <div>
+              {userName && <p className="text-sm font-medium text-gray-900">{userName}</p>}
+              {userEmail && <p className="text-xs text-gray-500">{userEmail}</p>}
+            </div>
+          </div>
+        )}
+
         {error && (
           <div className="mb-6 p-4 bg-red-50 rounded-xl flex items-center justify-between gap-4">
             <span className="text-red-600 text-sm">{error}</span>

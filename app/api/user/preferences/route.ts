@@ -64,10 +64,8 @@ export async function POST(request: NextRequest) {
       if (tier === 'free' && prefs.content_style) {
         const allowedStyles = PLANS.free.limits.styles as readonly string[]
         if (!allowedStyles.includes(prefs.content_style)) {
-          return NextResponse.json(
-            { error: 'Content style not available on free plan' },
-            { status: 403 }
-          )
+          // Silently default to 'tiktok' instead of rejecting
+          prefs.content_style = 'tiktok'
         }
       }
 
