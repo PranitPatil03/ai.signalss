@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await db
       .from('users')
-      .select('preferences, timezone, onboarding_completed, subscription_tier')
+      .select('preferences, timezone, onboarding_completed, subscription_tier, subscription_ends_at')
       .eq('id', targetUserId)
       .single()
 

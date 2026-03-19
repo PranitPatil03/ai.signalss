@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowLeft, Save, Plus, X, Check, Loader2, Lock, Crown, LogOut } from 'lucide-react'
+import { ArrowLeft, Save, Plus, X, Check, Loader2, Lock, Crown, LogOut, CheckCircle } from 'lucide-react'
 import { ContentStyle, DEFAULT_PREFERENCES, UserPreferences } from '@/lib/supabase'
 import { PLANS } from '@/lib/stripe'
 import { getAuthHeaders, syncCurrentUserProfile } from '@/lib/auth-client'
@@ -45,6 +45,8 @@ const TIMEZONES = [
 
 function SettingsContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const justUpgraded = searchParams.get('upgraded') === 'true'
   const [userId, setUserId] = useState<string | null>(null)
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [userName, setUserName] = useState<string | null>(null)
@@ -56,6 +58,7 @@ function SettingsContent() {
   const [error, setError] = useState<string | null>(null)
   const [errorIsUpgradeable, setErrorIsUpgradeable] = useState(false)
   const [userTier, setUserTier] = useState<'free' | 'pro'>('free')
+  const [subscriptionEndsAt, setSubscriptionEndsAt] = useState<string | null>(null)
 
   // Form state
   const [topics, setTopics] = useState<string[]>(DEFAULT_PREFERENCES.topics)
@@ -108,6 +111,7 @@ function SettingsContent() {
       setDigestTime(prefs.digest_time || '07:00')
       setTimezone(data.timezone || 'America/Los_Angeles')
       setUserTier(data.subscription_tier || 'free')
+      setSubscriptionEndsAt(data.subscription_ends_at || null)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load settings')
     }
@@ -270,6 +274,35 @@ function SettingsContent() {
               {userEmail && <p className="text-xs text-gray-500">{userEmail}</p>}
             </div>
           </div>
+        )}
+
+        {/* Upgraded success banner */}
+        {justUpgraded && (
+          <div className="mb-6 p-4 bg-emerald-50 rounded-xl flex items-center gap-3">
+            <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+            <span className="text-emerald-700 text-sm font-medium">Welcome to Pro! All premium features are now unlocked.</span>
+          </div>
+        )}
+
+        {/* Billing Status */}
+        {userTier === 'pro' && (
+          <section className="mb-10">
+            <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Billing</h2>
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-b from-blue-400 to-blue-600 flex items-center justify-center">
+                <Crown className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-gray-900">Pro Plan — Active</p>
+                {subscriptionEndsAt && (
+                  <p className="text-xs text-gray-500">
+                    Renews {new Date(subscriptionEndsAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                  </p>
+                )}
+              </div>
+              <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">Active</span>
+            </div>
+          </section>
         )}
 
         {error && (
@@ -570,5 +603,13 @@ function SettingsContent() {
 }
 
 export default function SettingsPage() {
-  return <SettingsContent />
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </main>
+    }>
+      <SettingsContent />
+    </Suspense>
+  )
 }

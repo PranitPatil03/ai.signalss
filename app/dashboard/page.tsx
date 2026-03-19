@@ -6,6 +6,7 @@ import { ScanButton } from '@/components/dashboard/ScanButton'
 import { TrackingBadge } from '@/components/dashboard/TrackingBadge'
 import { SettingsLink } from '@/components/dashboard/SettingsLink'
 import { LogoutButton } from '@/components/dashboard/LogoutButton'
+import { UpgradeButton } from '@/components/dashboard/UpgradeButton'
 import Link from 'next/link'
 
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -77,13 +78,7 @@ export default async function DashboardPage() {
             <span className="text-xl font-normal tracking-tight text-gray-900">signalss</span>
           </Link>
           <div className="flex items-center gap-3">
-            <a
-              href="/api/stripe/checkout"
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-b from-blue-400 to-blue-600 text-white text-sm font-medium rounded-xl shadow-[0_4px_14px_rgba(37,99,235,0.4)] hover:opacity-90 transition-opacity"
-            >
-              <Zap className="w-3.5 h-3.5" />
-              Upgrade to Pro
-            </a>
+            <UpgradeButton variant="header" />
             <SettingsLink />
             <LogoutButton />
           </div>

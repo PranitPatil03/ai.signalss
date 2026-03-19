@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { scanTrendsWithBreakdown } from '@/lib/scanner'
 import { isDuplicate } from '@/lib/utils'
-import { authorizeCronOrAdmin } from '@/lib/admin-auth'
+import { authorizeAuthenticatedOrCron } from '@/lib/admin-auth'
 
 export const maxDuration = 120 // Allow up to 2 minutes for scanning (more sources now)
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = await authorizeCronOrAdmin(request)
+    const auth = await authorizeAuthenticatedOrCron(request)
     if (!auth.ok) {
       return NextResponse.json(
         { error: auth.error },

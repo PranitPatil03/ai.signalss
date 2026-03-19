@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { getAuthenticatedUser } from '@/lib/auth-server'
 
-type AuthReason = 'cron' | 'admin-user'
+type AuthReason = 'cron' | 'admin-user' | 'authenticated-user'
 
 export type AdminAuthResult =
   | { ok: true; reason: AuthReason; userId?: string; email?: string }
@@ -86,6 +86,30 @@ export async function authorizeCronOrAdmin(request: NextRequest): Promise<AdminA
   return {
     ok: true,
     reason: 'admin-user',
+    userId: user.id,
+    email: user.email,
+  }
+}
+
+// Allows any authenticated user (for scan/refresh), plus cron
+export async function authorizeAuthenticatedOrCron(request: NextRequest): Promise<AdminAuthResult> {
+  const authHeader = request.headers.get('authorization')
+
+  // Support cron secret via Bearer token
+  const cronSecret = process.env.CRON_SECRET
+  if (cronSecret && authHeader === `Bearer ${cronSecret}`) {
+    return { ok: true, reason: 'cron' }
+  }
+
+  const user = await getAuthenticatedUser(request)
+
+  if (!user?.email || !user.id) {
+    return { ok: false, status: 401, error: 'Unauthorized' }
+  }
+
+  return {
+    ok: true,
+    reason: 'authenticated-user',
     userId: user.id,
     email: user.email,
   }

@@ -4,6 +4,10 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'signalss',
   description: 'Get personalized AI updates across startups, tech, research, business, and more — summarized daily so you stay ahead.',
+  icons: {
+    icon: '/images/logo.png',
+    apple: '/images/logo.png',
+  },
   openGraph: {
     title: 'signalss',
     description: 'AI updates that never sleep. Stay ahead without reading everything.',

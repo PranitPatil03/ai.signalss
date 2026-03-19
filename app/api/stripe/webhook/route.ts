@@ -53,12 +53,19 @@ export async function POST(request: NextRequest) {
             subscriptionEndsAt = new Date(subscription.current_period_end * 1000).toISOString()
           }
 
+          const updateData: Record<string, unknown> = {
+            subscription_tier: 'pro',
+            subscription_ends_at: subscriptionEndsAt,
+          }
+
+          // Save stripe customer ID for future lookups
+          if (session.customer) {
+            updateData.stripe_customer_id = session.customer as string
+          }
+
           await supabaseAdmin
             .from('users')
-            .update({
-              subscription_tier: 'pro',
-              subscription_ends_at: subscriptionEndsAt,
-            })
+            .update(updateData)
             .eq('id', userId)
 
           console.log(`User ${userId} upgraded to pro`)

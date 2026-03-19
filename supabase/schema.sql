@@ -18,7 +18,9 @@ create table if not exists users (
   }',
   onboarding_completed boolean default false,
   verification_token text,
-  token_expires_at timestamp with time zone
+  token_expires_at timestamp with time zone,
+  stripe_customer_id text,
+  subscription_ends_at timestamp with time zone
 );
 
 -- Trends table
