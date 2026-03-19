@@ -2,11 +2,11 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'AI Trend Digest - Daily AI News for Creators',
-  description: 'A 2-minute daily digest of AI news, written for creators not engineers. Get caught up on what matters.',
+  title: 'AI Daily Updates - Personalized AI Intelligence Briefing',
+  description: 'Get personalized AI updates across startups, tech, research, business, and more — summarized daily so you stay ahead.',
   openGraph: {
-    title: 'AI Trend Digest',
-    description: 'AI moves fast. We catch you up.',
+    title: 'AI Daily Updates',
+    description: 'AI updates that never sleep. Stay ahead without reading everything.',
     type: 'website',
   },
 }

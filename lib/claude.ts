@@ -32,9 +32,9 @@ async function withRetry<T>(
         const delay = attempt === 0
           ? RETRY_CONFIG.preRequestDelayMs
           : Math.min(
-              RETRY_CONFIG.initialDelayMs * Math.pow(RETRY_CONFIG.backoffMultiplier, attempt - 1),
-              RETRY_CONFIG.maxDelayMs
-            )
+            RETRY_CONFIG.initialDelayMs * Math.pow(RETRY_CONFIG.backoffMultiplier, attempt - 1),
+            RETRY_CONFIG.maxDelayMs
+          )
         console.log(`[${operationName}] ${attempt === 0 ? 'Pre-request delay' : `Retry ${attempt}/${RETRY_CONFIG.maxRetries}, waiting`}: ${delay}ms`)
         await sleep(delay)
       }
@@ -243,10 +243,10 @@ function extractJSON(text: string): { trends: TrendAnalysis[] } | null {
 export async function analyzeTrends(rawData: string, options?: AnalyzeOptions): Promise<TrendAnalysis[]> {
   const contentStyle = options?.contentStyle || 'tiktok'
   const stylePrompt = STYLE_PROMPTS[contentStyle]
-  const platformName = contentStyle === 'tiktok' ? 'TikTok' :
-    contentStyle === 'youtube' ? 'YouTube' :
-    contentStyle === 'linkedin' ? 'LinkedIn' :
-    contentStyle === 'newsletter' ? 'Newsletter' : 'Twitter/X'
+  const formatName = contentStyle === 'tiktok' ? 'Quick Summary' :
+    contentStyle === 'youtube' ? 'Deep Dive' :
+      contentStyle === 'linkedin' ? 'Professional Brief' :
+        contentStyle === 'newsletter' ? 'Full Report' : 'Key Takeaways'
 
   const topicsFilter = options?.topics?.length
     ? `\n\nFOCUS AREAS: Prioritize trends related to these topics: ${options.topics.join(', ')}`
@@ -259,13 +259,13 @@ export async function analyzeTrends(rawData: string, options?: AnalyzeOptions): 
       messages: [
         {
           role: 'user',
-          content: `You are an AI trend researcher for ${platformName} creators. I have raw data from multiple sources about what's trending in AI.
+          content: `You are an AI trend analyst providing a ${formatName} digest. I have raw data from multiple sources about what's trending in AI.
 
 Your job:
 1. Identify the 5 most important/interesting AI trends from this data
 2. For each, write a short summary a non-technical person can understand
-3. Suggest a ${platformName} content angle (hook/take)
-4. Write a script optimized for ${platformName}. Keep scripts under 100 words.
+3. Suggest an actionable insight or key takeaway
+4. Write a brief analysis in ${formatName} style. Keep under 100 words.
 ${topicsFilter}
 
 ${stylePrompt}
@@ -281,8 +281,8 @@ IMPORTANT: Your final response must be ONLY valid JSON with this exact structure
       "category": "models|tools|research|drama|tutorials",
       "summary": "2-3 sentences explaining what happened",
       "why_it_matters": "1 sentence for normal people",
-      "tiktok_angle": "Short hook idea for ${platformName}",
-      "script": "Full script optimized for ${platformName} (under 100 words)",
+      "tiktok_angle": "Actionable insight or key takeaway",
+      "script": "Brief analysis in ${formatName} style (under 100 words)",
       "sources": [{"url": "", "platform": "", "title": ""}],
       "engagement_score": 0-100
     }

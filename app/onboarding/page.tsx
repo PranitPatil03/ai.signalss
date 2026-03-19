@@ -2,36 +2,119 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Sparkles, ArrowRight, ArrowLeft, Check, Loader2 } from 'lucide-react'
+import { Sparkles, ArrowRight, ArrowLeft, Check, Loader2, Cpu, Rocket, FlaskConical, Briefcase, Palette, HeartPulse, GraduationCap, Film, Scale, Newspaper } from 'lucide-react'
 import { ContentStyle } from '@/lib/supabase'
 import { getAuthHeaders, syncCurrentUserProfile } from '@/lib/auth-client'
 
-const TOPIC_OPTIONS = [
-  { id: 'ai', label: 'AI & Machine Learning', keywords: ['AI', 'machine learning', 'LLM', 'neural network'] },
-  { id: 'llm', label: 'Large Language Models', keywords: ['GPT', 'Claude', 'Llama', 'LLM', 'chatbot'] },
-  { id: 'image', label: 'Image & Video AI', keywords: ['Midjourney', 'Stable Diffusion', 'DALL-E', 'Sora'] },
-  { id: 'coding', label: 'AI Coding Tools', keywords: ['Copilot', 'Cursor', 'code generation', 'programming'] },
-  { id: 'robotics', label: 'Robotics & Embodied AI', keywords: ['robotics', 'autonomous', 'self-driving'] },
-  { id: 'research', label: 'AI Research & Papers', keywords: ['research', 'paper', 'arxiv', 'benchmark'] },
-  { id: 'business', label: 'AI Business & Startups', keywords: ['startup', 'funding', 'enterprise', 'business'] },
-  { id: 'ethics', label: 'AI Safety & Ethics', keywords: ['safety', 'alignment', 'ethics', 'regulation'] },
+// Reddit-style domain categories
+const DOMAIN_CATEGORIES = [
+  {
+    id: 'tech',
+    label: 'Tech & Engineering',
+    description: 'AI tools, coding, developer workflows, infrastructure',
+    icon: Cpu,
+    color: 'from-blue-500/20 to-blue-600/10 border-blue-500/30',
+    iconColor: 'text-blue-400',
+    keywords: ['AI', 'machine learning', 'LLM', 'coding', 'Copilot', 'Cursor', 'programming', 'developer tools', 'infrastructure'],
+    subreddits: ['LocalLLaMA', 'MachineLearning', 'artificial'],
+  },
+  {
+    id: 'startups',
+    label: 'Startups & Founders',
+    description: 'AI-first companies, funding, product launches',
+    icon: Rocket,
+    color: 'from-amber-500/20 to-amber-600/10 border-amber-500/30',
+    iconColor: 'text-amber-400',
+    keywords: ['startup', 'funding', 'launch', 'founder', 'venture', 'YC', 'seed round', 'Series A'],
+    subreddits: ['artificial', 'MachineLearning'],
+  },
+  {
+    id: 'research',
+    label: 'Research & Papers',
+    description: 'Breakthroughs, benchmarks, arxiv, new architectures',
+    icon: FlaskConical,
+    color: 'from-purple-500/20 to-purple-600/10 border-purple-500/30',
+    iconColor: 'text-purple-400',
+    keywords: ['research', 'paper', 'arxiv', 'benchmark', 'neural network', 'transformer', 'architecture', 'SOTA'],
+    subreddits: ['MachineLearning', 'LocalLLaMA'],
+  },
+  {
+    id: 'business',
+    label: 'Business & Enterprise',
+    description: 'Enterprise AI adoption, automation, ROI, strategy',
+    icon: Briefcase,
+    color: 'from-emerald-500/20 to-emerald-600/10 border-emerald-500/30',
+    iconColor: 'text-emerald-400',
+    keywords: ['enterprise', 'business', 'automation', 'ROI', 'strategy', 'digital transformation', 'AI adoption'],
+    subreddits: ['artificial', 'ChatGPT'],
+  },
+  {
+    id: 'creative',
+    label: 'Creative & Design',
+    description: 'Image gen, video, music, creative AI tools',
+    icon: Palette,
+    color: 'from-pink-500/20 to-pink-600/10 border-pink-500/30',
+    iconColor: 'text-pink-400',
+    keywords: ['Midjourney', 'Stable Diffusion', 'DALL-E', 'Sora', 'image generation', 'creative AI', 'design'],
+    subreddits: ['StableDiffusion', 'artificial'],
+  },
+  {
+    id: 'healthcare',
+    label: 'Healthcare & Biotech',
+    description: 'Medical AI, drug discovery, diagnostics',
+    icon: HeartPulse,
+    color: 'from-red-500/20 to-red-600/10 border-red-500/30',
+    iconColor: 'text-red-400',
+    keywords: ['healthcare', 'medical AI', 'drug discovery', 'diagnostics', 'biotech', 'clinical AI'],
+    subreddits: ['MachineLearning', 'artificial'],
+  },
+  {
+    id: 'education',
+    label: 'Education & Learning',
+    description: 'AI tutoring, EdTech, skill development, courses',
+    icon: GraduationCap,
+    color: 'from-cyan-500/20 to-cyan-600/10 border-cyan-500/30',
+    iconColor: 'text-cyan-400',
+    keywords: ['education', 'learning', 'tutoring', 'EdTech', 'courses', 'AI education'],
+    subreddits: ['MachineLearning', 'ChatGPT'],
+  },
+  {
+    id: 'media',
+    label: 'Media & Entertainment',
+    description: 'AI in film, gaming, content, streaming',
+    icon: Film,
+    color: 'from-orange-500/20 to-orange-600/10 border-orange-500/30',
+    iconColor: 'text-orange-400',
+    keywords: ['gaming', 'film', 'entertainment', 'content', 'streaming', 'media AI'],
+    subreddits: ['artificial', 'StableDiffusion'],
+  },
+  {
+    id: 'safety',
+    label: 'AI Safety & Ethics',
+    description: 'Alignment, regulation, governance, responsible AI',
+    icon: Scale,
+    color: 'from-violet-500/20 to-violet-600/10 border-violet-500/30',
+    iconColor: 'text-violet-400',
+    keywords: ['safety', 'alignment', 'ethics', 'regulation', 'governance', 'responsible AI', 'bias'],
+    subreddits: ['MachineLearning', 'singularity'],
+  },
+  {
+    id: 'general',
+    label: 'General AI News',
+    description: 'Everything else — models, GPT, Claude, industry moves',
+    icon: Newspaper,
+    color: 'from-zinc-500/20 to-zinc-600/10 border-zinc-500/30',
+    iconColor: 'text-zinc-400',
+    keywords: ['GPT', 'Claude', 'Gemini', 'Llama', 'chatbot', 'language model', 'OpenAI', 'Anthropic'],
+    subreddits: ['ChatGPT', 'ClaudeAI', 'OpenAI', 'singularity'],
+  },
 ]
 
-const SUBREDDIT_OPTIONS = [
-  { id: 'LocalLLaMA', label: 'r/LocalLLaMA', description: 'Running AI models locally' },
-  { id: 'MachineLearning', label: 'r/MachineLearning', description: 'ML research & discussion' },
-  { id: 'artificial', label: 'r/artificial', description: 'General AI news' },
-  { id: 'ClaudeAI', label: 'r/ClaudeAI', description: 'Claude & Anthropic' },
-  { id: 'ChatGPT', label: 'r/ChatGPT', description: 'ChatGPT & OpenAI' },
-  { id: 'StableDiffusion', label: 'r/StableDiffusion', description: 'Image generation' },
-  { id: 'singularity', label: 'r/singularity', description: 'AGI & future of AI' },
-]
-
-const CONTENT_STYLES: { id: ContentStyle; label: string; description: string }[] = [
-  { id: 'tiktok', label: 'TikTok', description: 'Fast-paced, hook-driven, 30-45 sec scripts' },
-  { id: 'youtube', label: 'YouTube', description: 'More detailed explanations, longer format' },
-  { id: 'linkedin', label: 'LinkedIn', description: 'Professional tone, business-focused insights' },
-  { id: 'twitter', label: 'Twitter/X', description: 'Punchy takes, thread-style breakdowns' },
+const DIGEST_FORMATS: { id: ContentStyle; label: string; description: string }[] = [
+  { id: 'tiktok', label: 'Quick Summary', description: 'Fast, punchy highlights — under 2 minutes' },
+  { id: 'youtube', label: 'Deep Dive', description: 'Detailed analysis with context and examples' },
+  { id: 'linkedin', label: 'Professional Brief', description: 'Business-focused, concise insights' },
+  { id: 'twitter', label: 'Key Takeaways', description: 'Bullet-point style, most important points' },
 ]
 
 const TIMEZONES = [
@@ -41,6 +124,7 @@ const TIMEZONES = [
   { id: 'America/New_York', label: 'Eastern Time (ET)' },
   { id: 'Europe/London', label: 'London (GMT/BST)' },
   { id: 'Europe/Paris', label: 'Central Europe (CET)' },
+  { id: 'Asia/Kolkata', label: 'India (IST)' },
   { id: 'Asia/Tokyo', label: 'Japan (JST)' },
   { id: 'Asia/Singapore', label: 'Singapore (SGT)' },
   { id: 'Australia/Sydney', label: 'Sydney (AEST)' },
@@ -56,12 +140,10 @@ function OnboardingContent() {
   const [error, setError] = useState<string | null>(null)
 
   // Form state
-  const [selectedTopics, setSelectedTopics] = useState<string[]>(['ai', 'llm'])
-  const [customTopic, setCustomTopic] = useState('')
-  const [selectedSubreddits, setSelectedSubreddits] = useState<string[]>(['LocalLLaMA', 'MachineLearning', 'artificial'])
-  const [contentStyle, setContentStyle] = useState<ContentStyle>('tiktok')
+  const [selectedDomains, setSelectedDomains] = useState<string[]>(['tech', 'general'])
+  const [digestFormat, setDigestFormat] = useState<ContentStyle>('tiktok')
   const [digestTime, setDigestTime] = useState('07:00')
-  const [timezone, setTimezone] = useState('America/Los_Angeles')
+  const [timezone, setTimezone] = useState('Asia/Kolkata')
 
   useEffect(() => {
     const bootstrap = async () => {
@@ -84,23 +166,10 @@ function OnboardingContent() {
     bootstrap()
   }, [router])
 
-  const toggleTopic = (id: string) => {
-    setSelectedTopics(prev =>
-      prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]
+  const toggleDomain = (id: string) => {
+    setSelectedDomains(prev =>
+      prev.includes(id) ? prev.filter(d => d !== id) : [...prev, id]
     )
-  }
-
-  const toggleSubreddit = (id: string) => {
-    setSelectedSubreddits(prev =>
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-    )
-  }
-
-  const addCustomTopic = () => {
-    if (customTopic.trim() && !selectedTopics.includes(customTopic.trim())) {
-      setSelectedTopics(prev => [...prev, customTopic.trim()])
-      setCustomTopic('')
-    }
   }
 
   const handleSubmit = async () => {
@@ -109,21 +178,25 @@ function OnboardingContent() {
       return
     }
 
+    if (selectedDomains.length === 0) {
+      setError('Please select at least one domain.')
+      return
+    }
+
     setIsSubmitting(true)
     setError(null)
 
-    // Build topics array from selections
-    const topicKeywords = selectedTopics.flatMap(id => {
-      const option = TOPIC_OPTIONS.find(o => o.id === id)
-      return option ? option.keywords : [id] // Custom topics use the string directly
-    })
+    // Build topics and subreddits from selected domains
+    const selectedCategories = DOMAIN_CATEGORIES.filter(c => selectedDomains.includes(c.id))
+    const topicKeywords = Array.from(new Set(selectedCategories.flatMap(c => c.keywords)))
+    const subreddits = Array.from(new Set(selectedCategories.flatMap(c => c.subreddits)))
 
     const preferences = {
-      topics: Array.from(new Set(topicKeywords)), // Dedupe
-      subreddits: selectedSubreddits,
+      topics: topicKeywords,
+      subreddits,
       trusted_authors: [],
       digest_time: digestTime,
-      content_style: contentStyle,
+      content_style: digestFormat,
     }
 
     try {
@@ -144,7 +217,6 @@ function OnboardingContent() {
         throw new Error(data.error || 'Failed to save preferences')
       }
 
-      // Redirect to dashboard
       router.push('/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
@@ -155,173 +227,138 @@ function OnboardingContent() {
 
   if (isAuthLoading) {
     return (
-      <main className="min-h-screen bg-surface flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-electric" />
+      <main className="min-h-screen bg-[#09090b] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-surface flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl">
+    <main className="min-h-screen bg-[#09090b] flex items-center justify-center p-4">
+      <div className="w-full max-w-3xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="w-8 h-8 text-electric" />
-            <span className="text-2xl font-bold text-text-primary">AI Trend Digest</span>
+          <div className="flex items-center justify-center gap-2.5 mb-4">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400">
+              <Sparkles className="w-5 h-5" />
+            </span>
+            <span className="text-2xl font-bold text-white">AI Daily Updates</span>
           </div>
-          <p className="text-text-secondary">Let's personalize your digest</p>
+          <p className="text-zinc-400">Personalize your daily AI briefing</p>
         </div>
 
         {/* Progress */}
-        <div className="flex items-center justify-center gap-2 mb-8">
+        <div className="flex items-center justify-center gap-3 mb-8">
           {[1, 2, 3].map(s => (
-            <div
-              key={s}
-              className={`w-3 h-3 rounded-full transition-colors ${s === step ? 'bg-electric' : s < step ? 'bg-green-500' : 'bg-surface-hover'
-                }`}
-            />
+            <div key={s} className="flex items-center gap-3">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${s === step
+                    ? 'bg-emerald-500 text-white'
+                    : s < step
+                      ? 'bg-emerald-500/20 text-emerald-400'
+                      : 'bg-white/5 text-zinc-600'
+                  }`}
+              >
+                {s < step ? <Check className="w-4 h-4" /> : s}
+              </div>
+              {s < 3 && (
+                <div className={`w-12 h-0.5 rounded ${s < step ? 'bg-emerald-500/40' : 'bg-white/5'}`} />
+              )}
+            </div>
           ))}
         </div>
 
         {/* Step Content */}
-        <div className="bg-surface-elevated border border-border rounded-xl p-6">
+        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 md:p-8">
           {step === 1 && (
             <div>
-              <h2 className="text-xl font-semibold text-text-primary mb-2">
-                What topics do you want to track?
+              <h2 className="text-xl font-semibold text-white mb-1">
+                What domains interest you?
               </h2>
-              <p className="text-text-secondary text-sm mb-6">
-                Select the AI topics you want in your digest. We'll find trending content about these.
+              <p className="text-zinc-400 text-sm mb-6">
+                Choose the AI domains you want to follow. We&apos;ll curate your daily briefing around these.
               </p>
 
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                {TOPIC_OPTIONS.map(option => (
-                  <button
-                    key={option.id}
-                    onClick={() => toggleTopic(option.id)}
-                    className={`p-3 rounded-lg border text-left transition-colors ${selectedTopics.includes(option.id)
-                        ? 'border-electric bg-electric/10 text-text-primary'
-                        : 'border-border hover:border-text-muted text-text-secondary'
-                      }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className={`w-5 h-5 rounded border flex items-center justify-center ${selectedTopics.includes(option.id)
-                          ? 'bg-electric border-electric'
-                          : 'border-border'
-                        }`}>
-                        {selectedTopics.includes(option.id) && (
-                          <Check className="w-3 h-3 text-white" />
-                        )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {DOMAIN_CATEGORIES.map(domain => {
+                  const Icon = domain.icon
+                  const isSelected = selectedDomains.includes(domain.id)
+                  return (
+                    <button
+                      key={domain.id}
+                      onClick={() => toggleDomain(domain.id)}
+                      className={`group relative overflow-hidden rounded-xl border p-4 text-left transition-all ${isSelected
+                          ? `bg-gradient-to-br ${domain.color}`
+                          : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12]'
+                        }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${isSelected ? 'bg-white/10' : 'bg-white/5'
+                          }`}>
+                          <Icon className={`h-4 w-4 ${isSelected ? domain.iconColor : 'text-zinc-500'}`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className={`font-medium ${isSelected ? 'text-white' : 'text-zinc-300'}`}>
+                              {domain.label}
+                            </span>
+                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-all ${isSelected
+                                ? 'bg-emerald-500 border-emerald-500'
+                                : 'border-white/20'
+                              }`}>
+                              {isSelected && <Check className="w-3 h-3 text-white" />}
+                            </div>
+                          </div>
+                          <p className={`text-xs mt-0.5 ${isSelected ? 'text-white/60' : 'text-zinc-500'}`}>
+                            {domain.description}
+                          </p>
+                        </div>
                       </div>
-                      <span className="font-medium">{option.label}</span>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  )
+                })}
               </div>
 
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={customTopic}
-                  onChange={(e) => setCustomTopic(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && addCustomTopic()}
-                  placeholder="Add custom topic..."
-                  className="flex-1 px-3 py-2 bg-surface border border-border rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-electric"
-                />
-                <button
-                  onClick={addCustomTopic}
-                  className="px-4 py-2 bg-surface-hover border border-border rounded-lg text-text-primary hover:bg-surface transition-colors"
-                >
-                  Add
-                </button>
-              </div>
-
-              {selectedTopics.filter(t => !TOPIC_OPTIONS.find(o => o.id === t)).length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {selectedTopics
-                    .filter(t => !TOPIC_OPTIONS.find(o => o.id === t))
-                    .map(topic => (
-                      <span
-                        key={topic}
-                        className="px-3 py-1 bg-electric/10 border border-electric/30 rounded-full text-sm text-electric flex items-center gap-2"
-                      >
-                        {topic}
-                        <button
-                          onClick={() => setSelectedTopics(prev => prev.filter(t => t !== topic))}
-                          className="hover:text-white"
-                        >
-                          &times;
-                        </button>
-                      </span>
-                    ))}
+              {selectedDomains.length > 0 && (
+                <div className="mt-4 flex items-center gap-2 text-xs text-zinc-500">
+                  <Check className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>{selectedDomains.length} domain{selectedDomains.length !== 1 ? 's' : ''} selected</span>
                 </div>
               )}
-
-              <h3 className="text-lg font-medium text-text-primary mt-8 mb-4">
-                Which subreddits should we scan?
-              </h3>
-              <div className="grid grid-cols-2 gap-2">
-                {SUBREDDIT_OPTIONS.map(option => (
-                  <button
-                    key={option.id}
-                    onClick={() => toggleSubreddit(option.id)}
-                    className={`p-2 rounded-lg border text-left transition-colors ${selectedSubreddits.includes(option.id)
-                        ? 'border-electric bg-electric/10'
-                        : 'border-border hover:border-text-muted'
-                      }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className={`w-4 h-4 rounded border flex items-center justify-center ${selectedSubreddits.includes(option.id)
-                          ? 'bg-electric border-electric'
-                          : 'border-border'
-                        }`}>
-                        {selectedSubreddits.includes(option.id) && (
-                          <Check className="w-2.5 h-2.5 text-white" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-text-primary">{option.label}</div>
-                        <div className="text-xs text-text-muted">{option.description}</div>
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
             </div>
           )}
 
           {step === 2 && (
             <div>
-              <h2 className="text-xl font-semibold text-text-primary mb-2">
-                What's your content style?
+              <h2 className="text-xl font-semibold text-white mb-1">
+                How do you like your briefing?
               </h2>
-              <p className="text-text-secondary text-sm mb-6">
-                We'll write scripts optimized for your platform of choice.
+              <p className="text-zinc-400 text-sm mb-6">
+                Choose the format that works best for how you consume information.
               </p>
 
               <div className="grid gap-3">
-                {CONTENT_STYLES.map(style => (
+                {DIGEST_FORMATS.map(format => (
                   <button
-                    key={style.id}
-                    onClick={() => setContentStyle(style.id)}
-                    className={`p-4 rounded-lg border text-left transition-colors ${contentStyle === style.id
-                        ? 'border-electric bg-electric/10'
-                        : 'border-border hover:border-text-muted'
+                    key={format.id}
+                    onClick={() => setDigestFormat(format.id)}
+                    className={`p-4 rounded-xl border text-left transition-all ${digestFormat === format.id
+                        ? 'border-emerald-500/30 bg-emerald-500/10'
+                        : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04]'
                       }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${contentStyle === style.id
-                          ? 'border-electric'
-                          : 'border-border'
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${digestFormat === format.id ? 'border-emerald-400' : 'border-zinc-600'
                         }`}>
-                        {contentStyle === style.id && (
-                          <div className="w-2.5 h-2.5 rounded-full bg-electric" />
+                        {digestFormat === format.id && (
+                          <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
                         )}
                       </div>
                       <div>
-                        <div className="font-medium text-text-primary">{style.label}</div>
-                        <div className="text-sm text-text-muted">{style.description}</div>
+                        <div className={`font-medium ${digestFormat === format.id ? 'text-white' : 'text-zinc-300'}`}>
+                          {format.label}
+                        </div>
+                        <div className="text-sm text-zinc-500">{format.description}</div>
                       </div>
                     </div>
                   </button>
@@ -332,41 +369,62 @@ function OnboardingContent() {
 
           {step === 3 && (
             <div>
-              <h2 className="text-xl font-semibold text-text-primary mb-2">
+              <h2 className="text-xl font-semibold text-white mb-1">
                 When do you want your digest?
               </h2>
-              <p className="text-text-secondary text-sm mb-6">
-                We'll send your personalized AI trends at this time every day.
+              <p className="text-zinc-400 text-sm mb-6">
+                We&apos;ll send your personalized AI briefing at this time every day.
               </p>
 
               <div className="grid gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-2">
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">
                     Delivery Time
                   </label>
                   <input
                     type="time"
                     value={digestTime}
                     onChange={(e) => setDigestTime(e.target.value)}
-                    className="w-full px-4 py-3 bg-surface border border-border rounded-lg text-text-primary focus:outline-none focus:border-electric"
+                    className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-2">
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">
                     Timezone
                   </label>
                   <select
                     value={timezone}
                     onChange={(e) => setTimezone(e.target.value)}
-                    className="w-full px-4 py-3 bg-surface border border-border rounded-lg text-text-primary focus:outline-none focus:border-electric"
+                    className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20"
                   >
                     {TIMEZONES.map(tz => (
-                      <option key={tz.id} value={tz.id}>
+                      <option key={tz.id} value={tz.id} className="bg-[#111113] text-white">
                         {tz.label}
                       </option>
                     ))}
                   </select>
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div className="mt-6 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                <h3 className="text-sm font-medium text-zinc-300 mb-3">Your briefing setup</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Domains</span>
+                    <span className="text-zinc-300">
+                      {selectedDomains.map(d => DOMAIN_CATEGORIES.find(c => c.id === d)?.label.split(' ')[0]).join(', ')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Format</span>
+                    <span className="text-zinc-300">{DIGEST_FORMATS.find(f => f.id === digestFormat)?.label}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Delivery</span>
+                    <span className="text-zinc-300">{digestTime} ({TIMEZONES.find(t => t.id === timezone)?.label})</span>
+                  </div>
                 </div>
               </div>
 
@@ -384,7 +442,7 @@ function OnboardingContent() {
           <button
             onClick={() => setStep(s => s - 1)}
             disabled={step === 1}
-            className="flex items-center gap-2 px-4 py-2 text-text-secondary hover:text-text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-zinc-400 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -392,8 +450,15 @@ function OnboardingContent() {
 
           {step < 3 ? (
             <button
-              onClick={() => setStep(s => s + 1)}
-              className="flex items-center gap-2 px-6 py-2 bg-electric hover:bg-electric-dark text-white rounded-lg transition-colors"
+              onClick={() => {
+                if (step === 1 && selectedDomains.length === 0) {
+                  setError('Please select at least one domain.')
+                  return
+                }
+                setError(null)
+                setStep(s => s + 1)
+              }}
+              className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-xl transition-colors font-medium"
             >
               Next
               <ArrowRight className="w-4 h-4" />
@@ -402,10 +467,19 @@ function OnboardingContent() {
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-6 py-2 bg-electric hover:bg-electric-dark text-white rounded-lg transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-xl transition-colors disabled:opacity-50 font-medium"
             >
-              {isSubmitting ? 'Saving...' : 'Finish Setup'}
-              <Check className="w-4 h-4" />
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Setting up...
+                </>
+              ) : (
+                <>
+                  Start My Briefing
+                  <Check className="w-4 h-4" />
+                </>
+              )}
             </button>
           )}
         </div>

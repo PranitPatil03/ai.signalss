@@ -1,6 +1,6 @@
 # Signal
 
-Signal is a personalized AI updates platform that scans high-signal sources, ranks what matters, and delivers a daily creator-ready brief with scripts and angles.
+Signal is a personalized AI intelligence platform that scans high-signal sources, ranks what matters, and delivers a daily briefing with actionable insights — tailored to your interests across tech, startups, research, business, and more.
 
 ![Next.js](https://img.shields.io/badge/Next.js-14-black) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue) ![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green) ![Stripe](https://img.shields.io/badge/Stripe-Payments-purple)
 
@@ -11,8 +11,8 @@ Signal is a personalized AI updates platform that scans high-signal sources, ran
 - **Multi-source scanning**: Collects daily AI signals from Reddit, Hacker News, Bluesky, X, and curated RSS feeds.
 - **Relevance ranking**: Scores trends by source quality, engagement velocity, and user preference matching.
 - **AI summarization**: Converts raw links into plain-English updates with clear why-it-matters context.
-- **Script generation**: Produces ready-to-use TikTok/YouTube/LinkedIn/Twitter/Newsletter content drafts.
-- **Personalized feeds**: Tailors topics, subreddits, style, timezone, and send windows per user.
+- **Multiple digest formats**: Quick Summary, Deep Dive, Professional Brief, Key Takeaways, and Full Report.
+- **Domain-based personalization**: Choose from 10+ interest domains (Tech, Startups, Research, Business, Healthcare, etc.).
 - **Tiered access**: Supports free and pro feature limits with Stripe-based subscription upgrades.
 - **Automated delivery**: Sends daily digest emails with open tracking and secure unsubscribe handling.
 - **Admin-safe operations**: Restricts scan/send automation to cron or approved admin identities.
@@ -27,7 +27,7 @@ Signal is a personalized AI updates platform that scans high-signal sources, ran
 | Styling | Tailwind CSS v4, Lucide icons | Delivers the design system, responsive layouts, and iconography. |
 | Auth & DB | Supabase Auth + Postgres (supabase-js v2) | Handles email/password + Google OAuth sessions and stores users, trends, and digests. |
 | API Layer | Next.js Route Handlers | Exposes scan, digest, preferences, billing, tracking, and auth sync endpoints. |
-| AI Processing | Anthropic Claude SDK | Summarizes trends and generates creator-ready scripts/angles. |
+| AI Processing | Anthropic Claude SDK | Summarizes trends and generates actionable insights for each digest format. |
 | Billing | Stripe Checkout + Webhooks | Manages plan upgrades, subscription lifecycle, and entitlement updates. |
 | Email Delivery | Resend | Sends digest emails, tracks opens, and supports secure unsubscribe links. |
 | Deployment | Vercel | Hosts the Next.js app and runs scheduled cron-triggered operations. |

@@ -47,7 +47,7 @@ export function RefreshButton() {
       <button
         onClick={handleRefresh}
         disabled={isLoading}
-        className="flex items-center gap-2 px-3 py-1.5 text-sm bg-surface hover:bg-surface-hover border border-border rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex items-center gap-2 px-3 py-1.5 text-sm bg-white/5 hover:bg-white/10 border border-white/[0.08] rounded-lg text-zinc-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
         {isLoading ? 'Scanning...' : 'Refresh'}

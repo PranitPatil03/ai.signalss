@@ -34,23 +34,23 @@ export async function sendVerificationEmail(email: string, token: string) {
   const verifyUrl = `${process.env.NEXT_PUBLIC_URL}/api/verify?token=${token}`
 
   const { error } = await getResend().emails.send({
-    from: 'AI Trend Digest <onboarding@resend.dev>',
+    from: 'AI Daily Updates <onboarding@resend.dev>',
     to: email,
-    subject: 'Verify your email for AI Trend Digest',
+    subject: 'Verify your email for AI Daily Updates',
     html: `
-      <div style="font-family: system-ui, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
-        <h1 style="color: #3b82f6; font-size: 24px;">Welcome to AI Trend Digest!</h1>
-        <p style="color: #666; font-size: 16px; line-height: 1.6;">
-          Click the button below to verify your email and start receiving daily AI trend updates.
+      <div style="font-family: system-ui, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; background: #09090b; color: #fafafa;">
+        <h1 style="color: #10b981; font-size: 24px;">Welcome to AI Daily Updates!</h1>
+        <p style="color: #a1a1aa; font-size: 16px; line-height: 1.6;">
+          Click the button below to verify your email and start receiving daily AI intelligence briefings.
         </p>
-        <a href="${verifyUrl}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; margin: 20px 0;">
+        <a href="${verifyUrl}" style="display: inline-block; background: #10b981; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; margin: 20px 0;">
           Verify Email
         </a>
-        <p style="color: #999; font-size: 14px;">
+        <p style="color: #71717a; font-size: 14px;">
           Or copy this link: ${verifyUrl}
         </p>
-        <p style="color: #999; font-size: 12px; margin-top: 40px;">
-          If you didn't sign up for AI Trend Digest, you can ignore this email.
+        <p style="color: #52525b; font-size: 12px; margin-top: 40px;">
+          If you didn't sign up for AI Daily Updates, you can ignore this email.
         </p>
       </div>
     `,
@@ -96,31 +96,31 @@ export async function sendDigestEmail(
   }
 
   const trendsHtml = trends.map(trend => `
-    <div style="margin-bottom: 32px; padding: 20px; background: #f8f9fa; border-radius: 12px;">
-      <h3 style="margin: 0 0 12px; color: #111; font-size: 18px; font-weight: 600;">
+    <div style="margin-bottom: 32px; padding: 20px; background: #111113; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+      <h3 style="margin: 0 0 12px; color: #fafafa; font-size: 18px; font-weight: 600;">
         ${categoryEmojis[trend.category] || '📰'} ${trend.title}
       </h3>
-      <p style="margin: 0 0 12px; color: #444; font-size: 14px; line-height: 1.6;">
+      <p style="margin: 0 0 12px; color: #a1a1aa; font-size: 14px; line-height: 1.6;">
         ${trend.summary}
       </p>
       ${trend.tiktok_angle ? `
-        <p style="margin: 12px 0; padding: 10px; background: #fff3cd; border-radius: 6px; font-size: 13px; color: #856404;">
-          💡 <strong>Content angle:</strong> ${trend.tiktok_angle}
+        <p style="margin: 12px 0; padding: 10px; background: rgba(16,185,129,0.08); border-radius: 6px; font-size: 13px; color: #10b981;">
+          💡 <strong>Action:</strong> ${trend.tiktok_angle}
         </p>
       ` : ''}
       ${trend.script ? `
-        <div style="margin: 16px 0; padding: 16px; background: #e8f4f8; border-radius: 8px; border-left: 4px solid #3b82f6;">
-          <p style="margin: 0 0 8px; font-size: 12px; font-weight: 600; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px;">
-            📝 TikTok Script (30-45 sec)
+        <div style="margin: 16px 0; padding: 16px; background: rgba(16,185,129,0.05); border-radius: 8px; border-left: 4px solid #10b981;">
+          <p style="margin: 0 0 8px; font-size: 12px; font-weight: 600; color: #10b981; text-transform: uppercase; letter-spacing: 0.5px;">
+            📝 Summary
           </p>
-          <p style="margin: 0; color: #333; font-size: 14px; line-height: 1.7; white-space: pre-wrap;">
+          <p style="margin: 0; color: #d4d4d8; font-size: 14px; line-height: 1.7; white-space: pre-wrap;">
 ${trend.script}
           </p>
         </div>
       ` : ''}
       ${trend.sources.length > 0 ? `
-        <p style="margin: 12px 0 0; font-size: 12px; color: #666;">
-          📎 Source: <a href="${trend.sources[0].url}" style="color: #3b82f6; text-decoration: none;">${trend.sources[0].title || trend.sources[0].platform}</a>
+        <p style="margin: 12px 0 0; font-size: 12px; color: #71717a;">
+          📎 Source: <a href="${trend.sources[0].url}" style="color: #10b981; text-decoration: none;">${trend.sources[0].title || trend.sources[0].platform}</a>
         </p>
       ` : ''}
     </div>
@@ -128,48 +128,48 @@ ${trend.script}
 
   // Upgrade CTA for free users
   const upgradeCta = userTier === 'free' ? `
-    <div style="margin: 28px 0; padding: 20px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; text-align: center;">
-      <p style="margin: 0 0 12px; color: #92400e; font-size: 16px; font-weight: 600;">
+    <div style="margin: 28px 0; padding: 20px; background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(234,88,12,0.1) 100%); border: 1px solid rgba(245,158,11,0.2); border-radius: 12px; text-align: center;">
+      <p style="margin: 0 0 12px; color: #f59e0b; font-size: 16px; font-weight: 600;">
         ⭐ Unlock More with Pro
       </p>
-      <p style="margin: 0 0 16px; color: #a16207; font-size: 14px;">
-        Get unlimited topics, all content styles (YouTube, LinkedIn, Twitter, Newsletter), and custom delivery times.
+      <p style="margin: 0 0 16px; color: #a1a1aa; font-size: 14px;">
+        Get unlimited topics, all digest formats (Deep Dive, Professional Brief, Key Takeaways, Full Report), and custom delivery times.
       </p>
-        <a href="${process.env.NEXT_PUBLIC_URL}/settings" style="display: inline-block; padding: 10px 20px; background: #f59e0b; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">
+        <a href="${process.env.NEXT_PUBLIC_URL}/settings" style="display: inline-block; padding: 10px 20px; background: #f59e0b; color: #000; text-decoration: none; border-radius: 6px; font-weight: 600;">
         Upgrade for $12/mo
       </a>
     </div>
   ` : ''
 
   const { error } = await getResend().emails.send({
-    from: 'AI Trend Digest <onboarding@resend.dev>',
+    from: 'AI Daily Updates <onboarding@resend.dev>',
     to: email,
     subject: `🔥 AI Digest: ${topTopic} + ${trends.length - 1} more trends`,
     html: `
-      <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #fff;">
-        <div style="text-align: center; padding: 24px 0; border-bottom: 2px solid #eee; margin-bottom: 28px;">
-          <h1 style="margin: 0; color: #3b82f6; font-size: 28px; font-weight: 700;">AI Trend Digest</h1>
-          <p style="margin: 10px 0 0; color: #666; font-size: 14px;">
+      <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #09090b; color: #fafafa;">
+        <div style="text-align: center; padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 28px;">
+          <h1 style="margin: 0; color: #10b981; font-size: 28px; font-weight: 700;">AI Daily Updates</h1>
+          <p style="margin: 10px 0 0; color: #71717a; font-size: 14px;">
             ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
         </div>
 
-        <p style="color: #444; font-size: 16px; line-height: 1.6; margin-bottom: 28px;">
-          Here's what happened in AI while you were sleeping:
+        <p style="color: #a1a1aa; font-size: 16px; line-height: 1.6; margin-bottom: 28px;">
+          Here's your AI intelligence briefing:
         </p>
 
         ${trendsHtml}
 
         ${upgradeCta}
 
-        <div style="margin-top: 48px; padding-top: 24px; border-top: 2px solid #eee; text-align: center;">
-          <p style="color: #666; font-size: 14px; margin-bottom: 16px;">
-            <a href="${webViewUrl}" style="color: #3b82f6; text-decoration: none; font-weight: 500;">View in browser</a>
-            <span style="color: #ccc; margin: 0 8px;">·</span>
+        <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.06); text-align: center;">
+          <p style="color: #71717a; font-size: 14px; margin-bottom: 16px;">
+            <a href="${webViewUrl}" style="color: #10b981; text-decoration: none; font-weight: 500;">View in browser</a>
+            <span style="color: #3f3f46; margin: 0 8px;">·</span>
             Reply to this email with feedback
           </p>
-          <p style="color: #999; font-size: 12px;">
-            <a href="${unsubscribeUrl}" style="color: #999; text-decoration: none;">Unsubscribe</a>
+          <p style="color: #52525b; font-size: 12px;">
+            <a href="${unsubscribeUrl}" style="color: #52525b; text-decoration: none;">Unsubscribe</a>
           </p>
         </div>
 

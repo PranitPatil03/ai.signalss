@@ -107,11 +107,11 @@ export function EmailSignup({ buttonText = 'Get the digest' }: EmailSignupProps)
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md">
-      <div className="mb-4 inline-flex rounded-lg border border-border bg-surface p-1 text-sm">
+      <div className="mb-4 inline-flex rounded-lg border border-white/10 bg-white/5 p-1 text-sm">
         <button
           type="button"
           onClick={() => setMode('signup')}
-          className={`rounded-md px-3 py-1.5 transition-colors ${mode === 'signup' ? 'bg-emerald-600 text-white' : 'text-text-secondary hover:text-text-primary'
+          className={`rounded-md px-3 py-1.5 transition-colors ${mode === 'signup' ? 'bg-emerald-500 text-white' : 'text-zinc-400 hover:text-white'
             }`}
         >
           Sign up
@@ -119,7 +119,7 @@ export function EmailSignup({ buttonText = 'Get the digest' }: EmailSignupProps)
         <button
           type="button"
           onClick={() => setMode('signin')}
-          className={`rounded-md px-3 py-1.5 transition-colors ${mode === 'signin' ? 'bg-emerald-600 text-white' : 'text-text-secondary hover:text-text-primary'
+          className={`rounded-md px-3 py-1.5 transition-colors ${mode === 'signin' ? 'bg-emerald-500 text-white' : 'text-zinc-400 hover:text-white'
             }`}
         >
           Sign in
@@ -128,33 +128,33 @@ export function EmailSignup({ buttonText = 'Get the digest' }: EmailSignupProps)
 
       <div className="space-y-3">
         <label className="relative block">
-          <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
+          <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@email.com"
             disabled={status === 'loading'}
-            className="w-full rounded-lg border border-border bg-surface-elevated py-3 pl-10 pr-4 text-text-primary placeholder:text-text-muted focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50"
+            className="w-full rounded-lg border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-white placeholder:text-zinc-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50"
           />
         </label>
 
         <label className="relative block">
-          <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
+          <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="At least 8 characters"
             disabled={status === 'loading'}
-            className="w-full rounded-lg border border-border bg-surface-elevated py-3 pl-10 pr-4 text-text-primary placeholder:text-text-muted focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50"
+            className="w-full rounded-lg border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-white placeholder:text-zinc-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50"
           />
         </label>
 
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-700 bg-linear-to-b from-emerald-400 to-emerald-600 px-6 py-3 font-medium text-white shadow-[0_4px_14px_rgba(5,150,105,0.35)] transition-all hover:scale-[1.01] hover:shadow-[0_6px_20px_rgba(5,150,105,0.45)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 px-6 py-3 font-medium text-white shadow-[0_0_20px_rgba(16,185,129,0.25)] transition-all hover:bg-emerald-400 hover:shadow-[0_0_28px_rgba(16,185,129,0.35)] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {status === 'loading' ? (
             <>
@@ -172,7 +172,7 @@ export function EmailSignup({ buttonText = 'Get the digest' }: EmailSignupProps)
           type="button"
           onClick={handleGoogleAuth}
           disabled={status === 'loading'}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface px-6 py-3 font-medium text-text-primary transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-6 py-3 font-medium text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Continue with Google
         </button>
@@ -180,7 +180,7 @@ export function EmailSignup({ buttonText = 'Get the digest' }: EmailSignupProps)
 
       {message && (
         <div
-          className={`mt-3 flex items-center gap-2 text-sm ${status === 'success' ? 'text-green-400' : 'text-red-400'
+          className={`mt-3 flex items-center gap-2 text-sm ${status === 'success' ? 'text-emerald-400' : 'text-red-400'
             }`}
         >
           {status === 'success' ? (
@@ -192,9 +192,9 @@ export function EmailSignup({ buttonText = 'Get the digest' }: EmailSignupProps)
         </div>
       )}
 
-      <p className="mt-3 text-xs text-text-muted">
+      <p className="mt-3 text-xs text-zinc-500">
         {mode === 'signup'
-          ? 'Free forever. You can upgrade to Pro anytime.'
+          ? 'Free forever. Upgrade to Pro anytime.'
           : 'Welcome back. Continue where you left off.'}
       </p>
     </form>

@@ -20,7 +20,7 @@ export const PLANS = {
     price: 0,
     limits: {
       topics: 3,
-      styles: ['tiktok'] as const,
+      styles: ['tiktok'] as const, // 'tiktok' = Quick Summary internally
       customDigestTime: false,
     },
   },
@@ -30,7 +30,7 @@ export const PLANS = {
     priceId: process.env.STRIPE_PRO_PRICE_ID || '',
     limits: {
       topics: Infinity,
-      styles: ['tiktok', 'youtube', 'linkedin', 'twitter', 'newsletter'] as const,
+      styles: ['tiktok', 'youtube', 'linkedin', 'twitter', 'newsletter'] as const, // All digest formats
       customDigestTime: true,
     },
   },
