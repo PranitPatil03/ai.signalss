@@ -60,22 +60,26 @@ alter table trends enable row level security;
 alter table digests enable row level security;
 
 -- Public read access to trends
+drop policy if exists "Trends are publicly readable" on trends;
 create policy "Trends are publicly readable"
   on trends for select
   to anon
   using (true);
 
 -- Service role can do everything
+drop policy if exists "Service role has full access to users" on users;
 create policy "Service role has full access to users"
   on users for all
   to service_role
   using (true);
 
+drop policy if exists "Service role has full access to trends" on trends;
 create policy "Service role has full access to trends"
   on trends for all
   to service_role
   using (true);
 
+drop policy if exists "Service role has full access to digests" on digests;
 create policy "Service role has full access to digests"
   on digests for all
   to service_role
