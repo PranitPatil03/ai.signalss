@@ -65,7 +65,7 @@ async function createCheckoutSession(request: NextRequest) {
         quantity: 1,
       },
     ],
-    success_url: `${process.env.NEXT_PUBLIC_URL}/settings?upgraded=true`,
+    success_url: `${process.env.NEXT_PUBLIC_URL}/api/stripe/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.NEXT_PUBLIC_URL}/settings?cancelled=true`,
     metadata: { userId },
   })
