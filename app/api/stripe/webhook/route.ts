@@ -55,7 +55,6 @@ export async function POST(request: NextRequest) {
 
           const updateData: Record<string, unknown> = {
             subscription_tier: 'pro',
-            subscription_ends_at: subscriptionEndsAt,
           }
 
           // Save stripe customer ID for future lookups
@@ -63,10 +62,24 @@ export async function POST(request: NextRequest) {
             updateData.stripe_customer_id = session.customer as string
           }
 
-          await supabaseAdmin
+          // Try with subscription_ends_at, fall back without
+          if (subscriptionEndsAt) {
+            updateData.subscription_ends_at = subscriptionEndsAt
+          }
+
+          const { error: updateError } = await supabaseAdmin
             .from('users')
             .update(updateData)
             .eq('id', userId)
+
+          if (updateError && updateError.message?.includes('subscription_ends_at')) {
+            // Column doesn't exist — update without it
+            delete updateData.subscription_ends_at
+            await supabaseAdmin
+              .from('users')
+              .update(updateData)
+              .eq('id', userId)
+          }
 
           console.log(`User ${userId} upgraded to pro`)
         }

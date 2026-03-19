@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import {
-  createUserScopedSupabaseClient,
-  getAuthenticatedUser,
-  getBearerToken,
-} from '@/lib/auth-server'
-import { DEFAULT_PREFERENCES, getSupabaseAdmin, getSupabaseServiceKey } from '@/lib/supabase'
+import { getAuthenticatedUser } from '@/lib/auth-server'
+import { DEFAULT_PREFERENCES, getSupabaseAdmin } from '@/lib/supabase'
 
 type SyncResult = {
   id: string
@@ -23,57 +19,6 @@ function isUsersTableMissingError(error: unknown): boolean {
   )
 }
 
-async function syncWithAdmin(userId: string, email: string): Promise<SyncResult> {
-  const supabaseAdmin = getSupabaseAdmin()
-
-  const { data, error } = await supabaseAdmin
-    .from('users')
-    .upsert(
-      {
-        id: userId,
-        email,
-        verified: true,
-        preferences: DEFAULT_PREFERENCES,
-      },
-      { onConflict: 'id' }
-    )
-    .select('id, onboarding_completed')
-    .single()
-
-  if (error || !data) {
-    throw new Error(error?.message || 'Failed to sync user profile')
-  }
-
-  return data
-}
-
-async function syncWithUserScope(token: string, userId: string, email: string): Promise<SyncResult> {
-  const supabase = createUserScopedSupabaseClient(token)
-
-  const { data, error } = await supabase
-    .from('users')
-    .upsert(
-      {
-        id: userId,
-        email,
-        verified: true,
-        preferences: DEFAULT_PREFERENCES,
-      },
-      { onConflict: 'id' }
-    )
-    .select('id, onboarding_completed')
-    .single()
-
-  if (error || !data) {
-    throw new Error(
-      error?.message ||
-      'Failed to sync profile. Add SUPABASE_SERVICE_KEY or configure RLS policies for authenticated users.'
-    )
-  }
-
-  return data
-}
-
 export async function POST(request: NextRequest) {
   const user = await getAuthenticatedUser(request)
 
@@ -81,20 +26,30 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const token = getBearerToken(request)
-  if (!token) {
-    return NextResponse.json({ error: 'Missing access token' }, { status: 401 })
-  }
-
   try {
-    const hasServiceKey = Boolean(getSupabaseServiceKey())
-    const profile = hasServiceKey
-      ? await syncWithAdmin(user.id, user.email)
-      : await syncWithUserScope(token, user.id, user.email)
+    const supabaseAdmin = getSupabaseAdmin()
+
+    const { data, error } = await supabaseAdmin
+      .from('users')
+      .upsert(
+        {
+          id: user.id,
+          email: user.email,
+          verified: true,
+          preferences: DEFAULT_PREFERENCES,
+        },
+        { onConflict: 'id' }
+      )
+      .select('id, onboarding_completed')
+      .single()
+
+    if (error || !data) {
+      throw new Error(error?.message || 'Failed to sync user profile')
+    }
 
     return NextResponse.json({
-      userId: profile.id,
-      onboarding_completed: profile.onboarding_completed ?? false,
+      userId: data.id,
+      onboarding_completed: data.onboarding_completed ?? false,
       schema_ready: true,
     })
   } catch (error) {

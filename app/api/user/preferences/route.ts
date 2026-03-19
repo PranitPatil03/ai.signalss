@@ -1,26 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { UserPreferences, getSupabaseAdmin, getSupabaseServiceKey } from '@/lib/supabase'
+import { UserPreferences, getSupabaseAdmin } from '@/lib/supabase'
 import { PLANS } from '@/lib/stripe'
-import {
-  createUserScopedSupabaseClient,
-  getAuthenticatedUser,
-  getBearerToken,
-} from '@/lib/auth-server'
+import { getAuthenticatedUser } from '@/lib/auth-server'
 
 export async function POST(request: NextRequest) {
   try {
     const authUser = await getAuthenticatedUser(request)
-    const token = getBearerToken(request)
 
-    if (!authUser?.id || !token) {
+    if (!authUser?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    const hasServiceKey = Boolean(getSupabaseServiceKey())
-    const db = hasServiceKey ? getSupabaseAdmin() : createUserScopedSupabaseClient(token)
+    const db = getSupabaseAdmin()
 
     const body = await request.json()
     const { userId, preferences, timezone, onboarding_completed } = body
@@ -110,17 +104,15 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const authUser = await getAuthenticatedUser(request)
-    const token = getBearerToken(request)
 
-    if (!authUser?.id || !token) {
+    if (!authUser?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    const hasServiceKey = Boolean(getSupabaseServiceKey())
-    const db = hasServiceKey ? getSupabaseAdmin() : createUserScopedSupabaseClient(token)
+    const db = getSupabaseAdmin()
 
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
@@ -140,11 +132,27 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const { data, error } = await db
+    // Try with subscription_ends_at, fall back without it if column doesn't exist
+    let data, error
+    const result1 = await db
       .from('users')
       .select('preferences, timezone, onboarding_completed, subscription_tier, subscription_ends_at')
       .eq('id', targetUserId)
       .single()
+
+    if (result1.error && result1.error.message?.includes('subscription_ends_at')) {
+      // Column doesn't exist yet — query without it
+      const result2 = await db
+        .from('users')
+        .select('preferences, timezone, onboarding_completed, subscription_tier')
+        .eq('id', targetUserId)
+        .single()
+      data = result2.data
+      error = result2.error
+    } else {
+      data = result1.data
+      error = result1.error
+    }
 
     if (error) {
       console.error('Failed to fetch preferences:', error)

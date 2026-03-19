@@ -84,3 +84,22 @@ create policy "Service role has full access to digests"
   on digests for all
   to service_role
   using (true);
+
+-- Authenticated users can read/update their own row
+drop policy if exists "Users can read own data" on users;
+create policy "Users can read own data"
+  on users for select
+  to authenticated
+  using (auth.uid() = id);
+
+drop policy if exists "Users can update own data" on users;
+create policy "Users can update own data"
+  on users for update
+  to authenticated
+  using (auth.uid() = id);
+
+drop policy if exists "Users can insert own data" on users;
+create policy "Users can insert own data"
+  on users for insert
+  to authenticated
+  with check (auth.uid() = id);
