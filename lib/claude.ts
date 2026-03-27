@@ -2,9 +2,16 @@ import Anthropic from '@anthropic-ai/sdk'
 import { ContentStyle } from './supabase'
 import { sendErrorAlert } from './resend'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
+// Lazy singleton — process.env is only available inside request handlers on Cloudflare Workers
+let _anthropic: Anthropic | null = null
+function getAnthropic(): Anthropic {
+  if (!_anthropic) {
+    _anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    })
+  }
+  return _anthropic
+}
 
 // Retry configuration
 const RETRY_CONFIG = {
@@ -253,7 +260,7 @@ export async function analyzeTrends(rawData: string, options?: AnalyzeOptions): 
     : ''
 
   const response = await withRetry(
-    () => anthropic.messages.create({
+    () => getAnthropic().messages.create({
       model: 'claude-3-haiku-20240307',
       max_tokens: 4000,
       messages: [
