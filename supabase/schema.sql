@@ -44,8 +44,14 @@ create table if not exists digests (
   user_id uuid references users(id) on delete cascade,
   sent_at timestamp with time zone default now(),
   trends_included uuid[] default '{}', -- array of trend IDs
-  opened boolean default false
+  opened boolean default false,
+  opened_at timestamp with time zone,
+  clicked_at timestamp with time zone
 );
+
+-- Ensure tracking columns exist in already-provisioned projects
+alter table digests add column if not exists opened_at timestamp with time zone;
+alter table digests add column if not exists clicked_at timestamp with time zone;
 
 -- Indexes for performance
 create index if not exists idx_users_email on users(email);

@@ -16,6 +16,13 @@ export function getSupabaseBrowserClient(): SupabaseClient {
     ''
 
   if (!supabaseUrl || !publishableKey) {
+    // During static prerender on CI/platform builds, client components may render on server.
+    // Avoid hard-failing the build; runtime browser usage will still require valid env vars.
+    if (typeof window === 'undefined') {
+      browserClient = createClient('https://placeholder.supabase.co', 'placeholder-key')
+      return browserClient
+    }
+
     throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or Supabase publishable key')
   }
 

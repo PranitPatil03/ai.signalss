@@ -199,6 +199,79 @@ npm run dev
 3. Add environment variables
 4. Deploy
 
+### Cloudflare Pages (Full Project)
+
+This repo is configured for Cloudflare via OpenNext.
+
+#### 1) One-time setup
+
+```bash
+pnpm install
+pnpm run cf:build
+```
+
+Cloudflare config files in this repo:
+- `wrangler.jsonc`
+- `open-next.config.ts`
+
+#### 2) Create required Cloudflare resources
+
+Create the R2 bucket used for Next incremental cache (must match `wrangler.jsonc`):
+
+```bash
+pnpm wrangler r2 bucket create signalss-pages-opennext-cache
+```
+
+#### 3) Configure Cloudflare project
+
+Use Workers/Pages with this project connected to Git, then set:
+- Build command: `pnpm run cf:build`
+- Build output directory: `.open-next/assets`
+- Compatibility date: use latest stable (repo default is set in `wrangler.jsonc`)
+- Compatibility flags: `nodejs_compat`, `global_fetch_strictly_public`
+
+#### 4) Set environment variables in Cloudflare
+
+Set all variables from `.env.example`, especially:
+- `NEXT_PUBLIC_URL` (must be your Cloudflare production domain)
+- Supabase keys (`NEXT_PUBLIC_SUPABASE_URL`, publishable key, service role key)
+- `CRON_SECRET`
+- Stripe keys (`STRIPE_SECRET_KEY`, `STRIPE_PRO_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`)
+- `RESEND_API_KEY`, `ANTHROPIC_API_KEY`
+
+#### 5) Deploy
+
+```bash
+pnpm run cf:deploy
+```
+
+For local production-like preview:
+
+```bash
+pnpm run cf:preview
+```
+
+#### 6) Post-deploy provider updates
+
+- Supabase Auth: add Cloudflare domain in site/redirect URLs.
+- Stripe: set webhook endpoint to `https://<your-domain>/api/stripe/webhook` and update `STRIPE_WEBHOOK_SECRET`.
+- Resend links will use `NEXT_PUBLIC_URL`, so ensure it points to Cloudflare production domain.
+
+#### 7) Cron (Supabase scheduler)
+
+This project supports Bearer-token cron auth (`CRON_SECRET`) for non-Vercel schedulers.
+Configure Supabase scheduled jobs to call:
+
+```
+POST https://your-domain.com/api/scan
+Authorization: Bearer <CRON_SECRET>
+
+POST https://your-domain.com/api/send-digests
+Authorization: Bearer <CRON_SECRET>
+```
+
+> Note: `vercel.json` cron settings are only used on Vercel and can be ignored for Cloudflare.
+
 ### Cron Jobs
 
 ```
