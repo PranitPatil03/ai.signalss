@@ -4,7 +4,6 @@ import { scanTrendsWithBreakdown } from '@/lib/scanner'
 import { isDuplicate } from '@/lib/utils'
 import { authorizeAuthenticatedOrCron } from '@/lib/admin-auth'
 
-export const maxDuration = 120 // Allow up to 2 minutes for scanning (more sources now)
 
 export async function POST(request: NextRequest) {
   try {

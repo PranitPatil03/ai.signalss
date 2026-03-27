@@ -3,7 +3,6 @@ import { supabaseAdmin, UserPreferences, DEFAULT_PREFERENCES, Trend } from '@/li
 import { sendDigestEmail } from '@/lib/resend'
 import { authorizeCronOrAdmin } from '@/lib/admin-auth'
 
-export const maxDuration = 300 // Allow up to 5 minutes for sending all emails
 
 interface UserWithPreferences {
   id: string

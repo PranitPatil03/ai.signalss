@@ -13,7 +13,7 @@ export function getStripe(): Stripe {
   return _stripe
 }
 
-// Plan configuration
+// Plan configuration — priceId read lazily to work on Cloudflare Workers
 export const PLANS = {
   free: {
     name: 'Free',
@@ -28,7 +28,9 @@ export const PLANS = {
   pro: {
     name: 'Pro',
     price: 12,
-    priceId: process.env.STRIPE_PRO_PRICE_ID || '',
+    get priceId() {
+      return process.env.STRIPE_PRO_PRICE_ID || ''
+    },
     limits: {
       topics: Infinity,
       domains: Infinity, // Unlimited domain categories
