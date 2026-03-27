@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "signalss-pages",
+  "name": "aisignalss",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-03-28",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
@@ -11,13 +11,13 @@
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "signalss-pages"
+      "service": "aisignalss"
     }
   ],
   "r2_buckets": [
     {
       "binding": "NEXT_INC_CACHE_R2_BUCKET",
-      "bucket_name": "signalss-pages-opennext-cache"
+      "bucket_name": "aisignalss-opennext-cache"
     }
   ],
   "images": {
