@@ -42,7 +42,7 @@ export default async function DigestPage({ params, searchParams }: PageProps) {
     notFound()
   }
 
-  if (!token || !verifyDigestAccessToken(id, digest.user_id, token)) {
+  if (!token || !(await verifyDigestAccessToken(id, digest.user_id, token))) {
     notFound()
   }
 

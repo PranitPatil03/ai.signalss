@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
-// 1x1 transparent GIF
-const TRACKING_PIXEL = Buffer.from(
-  'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
-  'base64'
-)
+// 1x1 transparent GIF as Uint8Array (Cloudflare Workers compatible)
+const TRACKING_PIXEL = Uint8Array.from(atob('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'), c => c.charCodeAt(0))
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)

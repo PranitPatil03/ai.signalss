@@ -1,5 +1,4 @@
 import { Resend } from 'resend'
-import crypto from 'crypto'
 import { generateDigestAccessToken } from '@/lib/digest-token'
 
 let _resend: Resend | null = null
@@ -15,19 +14,27 @@ function getResend(): Resend {
   return _resend
 }
 
-// Generate unsubscribe token
-function generateUnsubscribeToken(userId: string): string {
+// Generate unsubscribe token using Web Crypto API
+async function generateUnsubscribeToken(userId: string): Promise<string> {
   const secret = process.env.UNSUBSCRIBE_SECRET
 
   if (!secret) {
     throw new Error('UNSUBSCRIBE_SECRET is required')
   }
 
-  return crypto
-    .createHmac('sha256', secret)
-    .update(userId)
-    .digest('hex')
-    .slice(0, 16)
+  const encoder = new TextEncoder()
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  )
+  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(userId))
+  const hex = Array.from(new Uint8Array(signature))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
+  return hex.slice(0, 16)
 }
 
 export async function sendVerificationEmail(email: string, token: string) {
@@ -78,13 +85,14 @@ export async function sendDigestEmail(
   userTier?: 'free' | 'pro'
 ) {
   const topTopic = trends[0]?.title || 'AI Updates'
-  const digestToken = userId ? generateDigestAccessToken(digestId, userId) : null
+  const digestToken = userId ? await generateDigestAccessToken(digestId, userId) : null
   const webViewUrl = digestToken
     ? `${process.env.NEXT_PUBLIC_URL}/digest/${digestId}?token=${digestToken}`
     : `${process.env.NEXT_PUBLIC_URL}/digest/${digestId}`
   const trackingPixelUrl = `${process.env.NEXT_PUBLIC_URL}/api/track/open?id=${digestId}`
-  const unsubscribeUrl = userId
-    ? `${process.env.NEXT_PUBLIC_URL}/api/unsubscribe?user=${userId}&token=${generateUnsubscribeToken(userId)}`
+  const unsubscribeToken = userId ? await generateUnsubscribeToken(userId) : null
+  const unsubscribeUrl = userId && unsubscribeToken
+    ? `${process.env.NEXT_PUBLIC_URL}/api/unsubscribe?user=${userId}&token=${unsubscribeToken}`
     : `${process.env.NEXT_PUBLIC_URL}/unsubscribe`
 
   const categoryEmojis: Record<string, string> = {

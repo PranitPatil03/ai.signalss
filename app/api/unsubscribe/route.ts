@@ -1,30 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import crypto from 'crypto'
 
 function getUnsubscribeSecret(): string | null {
   return process.env.UNSUBSCRIBE_SECRET || null
 }
 
+async function hmacHex(secret: string, data: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  )
+  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(data))
+  return Array.from(new Uint8Array(signature))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+
 // Verify unsubscribe token
-function verifyToken(userId: string, token: string): boolean {
+async function verifyToken(userId: string, token: string): Promise<boolean> {
   const secret = getUnsubscribeSecret()
 
   if (!secret) {
     return false
   }
 
-  const expectedToken = crypto
-    .createHmac('sha256', secret)
-    .update(userId)
-    .digest('hex')
-    .slice(0, 16)
+  const expectedToken = (await hmacHex(secret, userId)).slice(0, 16)
 
   if (expectedToken.length !== token.length) {
     return false
   }
 
-  return crypto.timingSafeEqual(Buffer.from(expectedToken), Buffer.from(token))
+  // Constant-time comparison
+  let mismatch = 0
+  for (let i = 0; i < expectedToken.length; i++) {
+    mismatch |= expectedToken.charCodeAt(i) ^ token.charCodeAt(i)
+  }
+  return mismatch === 0
 }
 
 export async function GET(request: NextRequest) {
@@ -37,7 +52,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Verify token
-  if (!verifyToken(userId, token)) {
+  if (!(await verifyToken(userId, token))) {
     return NextResponse.redirect(new URL('/unsubscribed?error=invalid', request.url))
   }
 
