@@ -71,10 +71,10 @@ async function fetchHackerNews(): Promise<RawTrendData[]> {
     const newStoryIds: number[] = await newStoriesRes.json()
 
     // Combine and dedupe, prioritizing top stories
-    const allIds = Array.from(new Set([...topStoryIds.slice(0, 50), ...newStoryIds.slice(0, 30)]))
+    // Keep total subrequests under 50 for Cloudflare Workers free plan
+    const allIds = Array.from(new Set([...topStoryIds.slice(0, 15), ...newStoryIds.slice(0, 5)]))
 
-    // Fetch stories in batches to avoid overwhelming the API
-    const storyPromises = allIds.slice(0, 70).map(async (id) => {
+    const storyPromises = allIds.slice(0, 15).map(async (id) => {
       const res = await fetch(
         `https://hacker-news.firebaseio.com/v0/item/${id}.json`
       )
@@ -117,7 +117,7 @@ async function fetchHackerNews(): Promise<RawTrendData[]> {
 async function fetchReddit(customSubreddits?: string[]): Promise<RawTrendData[]> {
   const subreddits = customSubreddits?.length
     ? customSubreddits
-    : ['LocalLLaMA', 'MachineLearning', 'artificial', 'ClaudeAI', 'ChatGPT', 'OpenAI', 'StableDiffusion', 'singularity']
+    : ['LocalLLaMA', 'MachineLearning']
   const results: RawTrendData[] = []
 
   for (const subreddit of subreddits) {
@@ -186,7 +186,7 @@ async function fetchBluesky(): Promise<RawTrendData[]> {
     ]
     const results: RawTrendData[] = []
 
-    for (const term of searchTerms.slice(0, 4)) { // Process 4 terms
+    for (const term of searchTerms.slice(0, 1)) { // 1 term to stay within Worker subrequest limits
       try {
         const res = await fetch(
           `https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?q=${encodeURIComponent(term)}&limit=30&sort=top`,
@@ -288,22 +288,11 @@ async function fetchTwitter(): Promise<RawTrendData[]> {
 
 // Expanded RSS feeds
 async function fetchRSSFeeds(): Promise<RawTrendData[]> {
+  // Limited to 3 feeds to stay within Cloudflare Workers 50 subrequest limit
   const feeds = [
-    // Official AI company blogs (Tier 1)
     { name: 'Anthropic Blog', url: 'https://www.anthropic.com/rss.xml', tier: 1 },
     { name: 'OpenAI Blog', url: 'https://openai.com/blog/rss.xml', tier: 1 },
-    { name: 'Google AI Blog', url: 'https://blog.google/technology/ai/rss/', tier: 1 },
-    { name: 'DeepMind Blog', url: 'https://deepmind.google/blog/rss.xml', tier: 1 },
-
-    // Tech news (Tier 2)
     { name: 'TechCrunch AI', url: 'https://techcrunch.com/category/artificial-intelligence/feed/', tier: 2 },
-    { name: 'The Verge AI', url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml', tier: 2 },
-    { name: 'Ars Technica AI', url: 'https://feeds.arstechnica.com/arstechnica/technology-lab', tier: 2 },
-    { name: 'MIT Tech Review', url: 'https://www.technologyreview.com/feed/', tier: 2 },
-
-    // AI-focused publications (Tier 2)
-    { name: 'The Decoder', url: 'https://the-decoder.com/feed/', tier: 2 },
-    { name: 'VentureBeat AI', url: 'https://venturebeat.com/category/ai/feed/', tier: 2 },
   ]
 
   const results: RawTrendData[] = []
@@ -526,8 +515,8 @@ export async function scanTrendsWithBreakdown(options?: ScanOptions): Promise<Sc
   }
   let scoredTrends = rankTrends(allTrends, rankingOptions)
 
-  // Cap to top 30 items to reduce Claude API costs
-  scoredTrends = scoredTrends.slice(0, 30)
+  // Cap to top 15 items to reduce Claude API costs and stay under token limits
+  scoredTrends = scoredTrends.slice(0, 15)
 
   console.log('\nTop 5 ranked trends:')
   for (const t of scoredTrends.slice(0, 5)) {

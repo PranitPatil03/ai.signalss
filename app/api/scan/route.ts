@@ -66,10 +66,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Clear existing trends for today (in case of re-run)
-    await supabaseAdmin
+    const { error: deleteError } = await supabaseAdmin
       .from('trends')
       .delete()
       .eq('date', today)
+
+    if (deleteError) {
+      console.error('Failed to delete old trends:', JSON.stringify(deleteError))
+    }
 
     // Insert new trends
     const trendsToInsert = uniqueTrends.map(trend => ({
@@ -89,9 +93,9 @@ export async function POST(request: NextRequest) {
       .insert(trendsToInsert)
 
     if (error) {
-      console.error('Failed to insert trends:', error)
+      console.error('Failed to insert trends:', JSON.stringify(error))
       return NextResponse.json(
-        { error: 'Failed to save trends' },
+        { error: 'Failed to save trends', details: error.message || JSON.stringify(error), code: error.code, hint: error.hint },
         { status: 500 }
       )
     }

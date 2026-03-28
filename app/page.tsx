@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
@@ -147,6 +148,23 @@ function SignalCard({ card }: { card: typeof signalCardsRow1[0] }) {
 
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0)
+  const router = useRouter()
+
+  // Redirect logged-in users to dashboard
+  useEffect(() => {
+    (async () => {
+      try {
+        const { getSupabaseBrowserClient } = await import('@/lib/supabase-browser')
+        const supabase = getSupabaseBrowserClient()
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          router.replace('/dashboard')
+        }
+      } catch {
+        // Not logged in, stay on landing page
+      }
+    })()
+  }, [router])
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#f8fafc]">

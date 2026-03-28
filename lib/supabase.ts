@@ -37,7 +37,12 @@ function createSupabaseAdmin(): SupabaseClient {
     throw new Error('Supabase URL and key are required')
   }
 
-  return createClient(url, privilegedKey)
+  return createClient(url, privilegedKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
 }
 
 // Lazy singletons

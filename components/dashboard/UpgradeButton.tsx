@@ -53,9 +53,13 @@ export function UpgradeButton({ variant = 'header' }: UpgradeButtonProps) {
       const data = await response.json()
       if (data.url) {
         window.location.href = data.url
+      } else {
+        console.error('Checkout error:', data)
+        alert(data.error || 'Failed to start checkout')
       }
-    } catch {
-      // Fallback
+    } catch (err) {
+      console.error('Checkout error:', err)
+      alert('Failed to connect to payment service')
     } finally {
       setIsUpgrading(false)
     }
