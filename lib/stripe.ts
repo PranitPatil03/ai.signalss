@@ -8,7 +8,9 @@ export function getStripe(): Stripe {
     if (!secretKey) {
       throw new Error('STRIPE_SECRET_KEY is required')
     }
-    _stripe = new Stripe(secretKey)
+    _stripe = new Stripe(secretKey, {
+      httpClient: Stripe.createFetchHttpClient(),
+    })
   }
   return _stripe
 }

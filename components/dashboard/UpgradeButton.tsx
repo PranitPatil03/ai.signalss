@@ -55,7 +55,7 @@ export function UpgradeButton({ variant = 'header' }: UpgradeButtonProps) {
         window.location.href = data.url
       } else {
         console.error('Checkout error:', data)
-        alert(data.error || 'Failed to start checkout')
+        alert(data.details || data.error || 'Failed to start checkout')
       }
     } catch (err) {
       console.error('Checkout error:', err)
